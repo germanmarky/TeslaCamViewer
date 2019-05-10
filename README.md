@@ -14,6 +14,7 @@ Version 2019.19.1
 
 [Standalone Version](Binary/Standalone-TeslaCamViewer-2019.19.1.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
+[YouTube Demo](https://youtu.be/DXO11PsjMOY)
 
 Features
 --------
