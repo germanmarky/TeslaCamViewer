@@ -25,7 +25,7 @@ Features
 * Quick pre-view of single video files while hovering
 * Adjustable playback speed for quick analysis of triggered Sentry Mode/Manual TeslaCam Events
 * Keyboard shortcuts for all controls.  (See popup when hovering over objects)
-* Auto saved Layout and Custom folder location. (Saved under %homepath%\AppData\Local\Nate_Mccomb)
+* Auto saved Layout and Custom folder location. (Settings saved under: %homepath%\AppData\Local\Nate_Mccomb)
 
 
 
