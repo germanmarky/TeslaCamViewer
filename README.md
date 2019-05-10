@@ -34,3 +34,4 @@ Features
 Known Bugs
 -------
 * Some TeslaCam .mp4 files get corrupt either while they are being saved or within the video itself. Some video playback windows may not populate due to this reason. 
+* If Explorer window is on the right two locations within the app, the preview window will not load properly. - Will be fixed in next update.
