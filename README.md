@@ -8,7 +8,7 @@ Install
 ======================================
 I have included a precompiled version in the Binary folder for easy install.
 
-Version 2019.19.1
+Version 2019.20.1
 
 [Windows Installer Version](Binary/Installer-TeslaCamerViewer-2019.19.1.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
 
