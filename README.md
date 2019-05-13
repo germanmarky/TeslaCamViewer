@@ -10,8 +10,8 @@ I have included a precompiled version in the Binary folder for easy install.
 
 Version 2019.20.1
 
-[Windows Installer Version](Binary/Installer-TeslaCamerViewer-2019.20.1.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
-
+[Windows Installer Version](Binary/Installer-TeslaCamViewer-2019.20.1.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
+                    
 [Standalone Version](Binary/Standalone-TeslaCamViewer-2019.20.1.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
 [YouTube Demo](https://youtu.be/DXO11PsjMOY)
