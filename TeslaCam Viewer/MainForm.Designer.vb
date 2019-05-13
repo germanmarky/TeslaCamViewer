@@ -23,7 +23,7 @@ Partial Class MainForm
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim TreeNode9 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Custom Folder")
+        Dim TreeNode1 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Custom Folder")
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
         Me.Tv_Explorer = New System.Windows.Forms.TreeView()
         Me.Tv_ImgList = New System.Windows.Forms.ImageList(Me.components)
@@ -36,16 +36,19 @@ Partial Class MainForm
         Me.TxtBx_Path = New System.Windows.Forms.TextBox()
         Me.GroupBoxCONTROLS = New System.Windows.Forms.GroupBox()
         Me.GBsubCONTROLS = New System.Windows.Forms.GroupBox()
-        Me.UPDATELabel = New System.Windows.Forms.Label()
         Me.Donation = New System.Windows.Forms.Button()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.UPDATELabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.ClipSelectDOWN = New System.Windows.Forms.Button()
+        Me.ClipSelectUP = New System.Windows.Forms.Button()
+        Me.CurrentTimeList = New System.Windows.Forms.ListBox()
         Me.BtnREVERSE = New System.Windows.Forms.Button()
         Me.BtnPAUSE = New System.Windows.Forms.Button()
         Me.BtnPLAY = New System.Windows.Forms.Button()
         Me.TrackBar1 = New System.Windows.Forms.TrackBar()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.TCLabelMax = New System.Windows.Forms.Label()
-        Me.Label7 = New System.Windows.Forms.Label()
         Me.TrackBar2 = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -86,14 +89,14 @@ Partial Class MainForm
         Me.Tv_Explorer.HotTracking = True
         Me.Tv_Explorer.Location = New System.Drawing.Point(0, 13)
         Me.Tv_Explorer.Name = "Tv_Explorer"
-        TreeNode9.Name = "Node0"
-        TreeNode9.Tag = "Custom"
-        TreeNode9.Text = "Custom Folder"
-        TreeNode9.ToolTipText = "Custom Folder"
-        Me.Tv_Explorer.Nodes.AddRange(New System.Windows.Forms.TreeNode() {TreeNode9})
+        TreeNode1.Name = "Node0"
+        TreeNode1.Tag = "Custom"
+        TreeNode1.Text = "Custom Folder"
+        TreeNode1.ToolTipText = "Custom Folder"
+        Me.Tv_Explorer.Nodes.AddRange(New System.Windows.Forms.TreeNode() {TreeNode1})
         Me.Tv_Explorer.ShowNodeToolTips = True
         Me.Tv_Explorer.Size = New System.Drawing.Size(376, 266)
-        Me.Tv_Explorer.TabIndex = 3
+        Me.Tv_Explorer.TabIndex = 1
         '
         'Tv_ImgList
         '
@@ -123,6 +126,7 @@ Partial Class MainForm
         Me.PlayerRight.OcxState = CType(resources.GetObject("PlayerRight.OcxState"), System.Windows.Forms.AxHost.State)
         Me.PlayerRight.Size = New System.Drawing.Size(359, 255)
         Me.PlayerRight.TabIndex = 2
+        Me.PlayerRight.TabStop = False
         '
         'GroupBoxFRONT
         '
@@ -146,6 +150,7 @@ Partial Class MainForm
         Me.PlayerCenter.OcxState = CType(resources.GetObject("PlayerCenter.OcxState"), System.Windows.Forms.AxHost.State)
         Me.PlayerCenter.Size = New System.Drawing.Size(359, 255)
         Me.PlayerCenter.TabIndex = 0
+        Me.PlayerCenter.TabStop = False
         '
         'GroupBoxLEFTREPEATER
         '
@@ -169,6 +174,7 @@ Partial Class MainForm
         Me.PlayerLeft.OcxState = CType(resources.GetObject("PlayerLeft.OcxState"), System.Windows.Forms.AxHost.State)
         Me.PlayerLeft.Size = New System.Drawing.Size(359, 255)
         Me.PlayerLeft.TabIndex = 1
+        Me.PlayerLeft.TabStop = False
         '
         'TxtBx_Path
         '
@@ -179,6 +185,7 @@ Partial Class MainForm
         Me.TxtBx_Path.Name = "TxtBx_Path"
         Me.TxtBx_Path.Size = New System.Drawing.Size(262, 112)
         Me.TxtBx_Path.TabIndex = 5
+        Me.TxtBx_Path.TabStop = False
         Me.TxtBx_Path.Visible = False
         '
         'GroupBoxCONTROLS
@@ -218,6 +225,30 @@ Partial Class MainForm
         Me.GBsubCONTROLS.TabIndex = 19
         Me.GBsubCONTROLS.TabStop = False
         '
+        'Donation
+        '
+        Me.Donation.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Donation.BackColor = System.Drawing.Color.DimGray
+        Me.Donation.BackgroundImage = Global.TeslaCam_Viewer.My.Resources.Resources.PayPalMe
+        Me.Donation.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
+        Me.Donation.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Donation.Location = New System.Drawing.Point(292, 181)
+        Me.Donation.Name = "Donation"
+        Me.Donation.Size = New System.Drawing.Size(59, 54)
+        Me.Donation.TabIndex = 18
+        Me.Donation.TabStop = False
+        Me.Donation.UseVisualStyleBackColor = False
+        '
+        'Label7
+        '
+        Me.Label7.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(284, 236)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(74, 13)
+        Me.Label7.TabIndex = 15
+        Me.Label7.Text = "Nate Mccomb"
+        '
         'UPDATELabel
         '
         Me.UPDATELabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
@@ -230,37 +261,56 @@ Partial Class MainForm
         Me.UPDATELabel.Text = "Check for Updates"
         Me.UPDATELabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'Donation
-        '
-        Me.Donation.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Donation.BackColor = System.Drawing.Color.DimGray
-        Me.Donation.BackgroundImage = Global.TeslaCam_Viewer.My.Resources.Resources.PayPalMe
-        Me.Donation.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.Donation.Cursor = System.Windows.Forms.Cursors.Default
-        Me.Donation.Location = New System.Drawing.Point(292, 181)
-        Me.Donation.Name = "Donation"
-        Me.Donation.Size = New System.Drawing.Size(59, 54)
-        Me.Donation.TabIndex = 18
-        Me.Donation.UseVisualStyleBackColor = False
-        '
         'GroupBox2
         '
+        Me.GroupBox2.Anchor = System.Windows.Forms.AnchorStyles.Top
+        Me.GroupBox2.Controls.Add(Me.ClipSelectDOWN)
+        Me.GroupBox2.Controls.Add(Me.ClipSelectUP)
+        Me.GroupBox2.Controls.Add(Me.CurrentTimeList)
         Me.GroupBox2.Controls.Add(Me.BtnREVERSE)
         Me.GroupBox2.Controls.Add(Me.BtnPAUSE)
         Me.GroupBox2.Controls.Add(Me.BtnPLAY)
-        Me.GroupBox2.Location = New System.Drawing.Point(97, 90)
+        Me.GroupBox2.Location = New System.Drawing.Point(98, 87)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(163, 49)
+        Me.GroupBox2.Size = New System.Drawing.Size(172, 128)
         Me.GroupBox2.TabIndex = 17
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Controls"
+        '
+        'ClipSelectDOWN
+        '
+        Me.ClipSelectDOWN.Location = New System.Drawing.Point(96, 89)
+        Me.ClipSelectDOWN.Name = "ClipSelectDOWN"
+        Me.ClipSelectDOWN.Size = New System.Drawing.Size(25, 26)
+        Me.ClipSelectDOWN.TabIndex = 5
+        Me.ClipSelectDOWN.TabStop = False
+        Me.ClipSelectDOWN.Text = "\/"
+        Me.ClipSelectDOWN.UseVisualStyleBackColor = True
+        '
+        'ClipSelectUP
+        '
+        Me.ClipSelectUP.Location = New System.Drawing.Point(96, 55)
+        Me.ClipSelectUP.Name = "ClipSelectUP"
+        Me.ClipSelectUP.Size = New System.Drawing.Size(25, 26)
+        Me.ClipSelectUP.TabIndex = 4
+        Me.ClipSelectUP.TabStop = False
+        Me.ClipSelectUP.Text = "/\"
+        Me.ClipSelectUP.UseVisualStyleBackColor = True
+        '
+        'CurrentTimeList
+        '
+        Me.CurrentTimeList.FormattingEnabled = True
+        Me.CurrentTimeList.Location = New System.Drawing.Point(23, 50)
+        Me.CurrentTimeList.Name = "CurrentTimeList"
+        Me.CurrentTimeList.Size = New System.Drawing.Size(67, 69)
+        Me.CurrentTimeList.TabIndex = 2
         '
         'BtnREVERSE
         '
         Me.BtnREVERSE.Location = New System.Drawing.Point(5, 19)
         Me.BtnREVERSE.Name = "BtnREVERSE"
         Me.BtnREVERSE.Size = New System.Drawing.Size(56, 23)
-        Me.BtnREVERSE.TabIndex = 2
+        Me.BtnREVERSE.TabIndex = 5
         Me.BtnREVERSE.Text = "Reverse"
         Me.BtnREVERSE.UseVisualStyleBackColor = True
         '
@@ -269,7 +319,7 @@ Partial Class MainForm
         Me.BtnPAUSE.Location = New System.Drawing.Point(109, 19)
         Me.BtnPAUSE.Name = "BtnPAUSE"
         Me.BtnPAUSE.Size = New System.Drawing.Size(49, 23)
-        Me.BtnPAUSE.TabIndex = 1
+        Me.BtnPAUSE.TabIndex = 4
         Me.BtnPAUSE.Text = "Pause"
         Me.BtnPAUSE.UseVisualStyleBackColor = True
         '
@@ -278,7 +328,7 @@ Partial Class MainForm
         Me.BtnPLAY.Location = New System.Drawing.Point(64, 19)
         Me.BtnPLAY.Name = "BtnPLAY"
         Me.BtnPLAY.Size = New System.Drawing.Size(42, 23)
-        Me.BtnPLAY.TabIndex = 0
+        Me.BtnPLAY.TabIndex = 3
         Me.BtnPLAY.Text = "Play"
         Me.BtnPLAY.UseVisualStyleBackColor = True
         '
@@ -292,6 +342,7 @@ Partial Class MainForm
         Me.TrackBar1.Name = "TrackBar1"
         Me.TrackBar1.Size = New System.Drawing.Size(347, 45)
         Me.TrackBar1.TabIndex = 4
+        Me.TrackBar1.TabStop = False
         Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.Both
         '
         'PictureBox1
@@ -315,16 +366,6 @@ Partial Class MainForm
         Me.TCLabelMax.TabIndex = 6
         Me.TCLabelMax.Text = "             "
         '
-        'Label7
-        '
-        Me.Label7.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(284, 236)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(74, 13)
-        Me.Label7.TabIndex = 15
-        Me.Label7.Text = "Nate Mccomb"
-        '
         'TrackBar2
         '
         Me.TrackBar2.Cursor = System.Windows.Forms.Cursors.NoMoveVert
@@ -336,6 +377,7 @@ Partial Class MainForm
         Me.TrackBar2.Orientation = System.Windows.Forms.Orientation.Vertical
         Me.TrackBar2.Size = New System.Drawing.Size(45, 169)
         Me.TrackBar2.TabIndex = 7
+        Me.TrackBar2.TabStop = False
         Me.TrackBar2.TickFrequency = 10
         Me.TrackBar2.TickStyle = System.Windows.Forms.TickStyle.Both
         Me.TrackBar2.Value = 10
@@ -360,8 +402,7 @@ Partial Class MainForm
         '
         'Label5
         '
-        Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label5.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.Label5.AutoSize = True
         Me.Label5.Location = New System.Drawing.Point(120, 15)
         Me.Label5.Name = "Label5"
@@ -405,6 +446,7 @@ Partial Class MainForm
         Me.PlayerMediaInfo.OcxState = CType(resources.GetObject("PlayerMediaInfo.OcxState"), System.Windows.Forms.AxHost.State)
         Me.PlayerMediaInfo.Size = New System.Drawing.Size(132, 76)
         Me.PlayerMediaInfo.TabIndex = 12
+        Me.PlayerMediaInfo.TabStop = False
         Me.PlayerMediaInfo.Visible = False
         '
         'Label4
@@ -455,6 +497,7 @@ Partial Class MainForm
         Me.PlayerPreview.OcxState = CType(resources.GetObject("PlayerPreview.OcxState"), System.Windows.Forms.AxHost.State)
         Me.PlayerPreview.Size = New System.Drawing.Size(471, 380)
         Me.PlayerPreview.TabIndex = 0
+        Me.PlayerPreview.TabStop = False
         '
         'MainForm
         '
@@ -531,4 +574,7 @@ Partial Class MainForm
     Friend WithEvents Donation As Button
     Private WithEvents GBsubCONTROLS As GroupBox
     Private WithEvents UPDATELabel As Label
+    Friend WithEvents ClipSelectDOWN As Button
+    Friend WithEvents ClipSelectUP As Button
+    Friend WithEvents CurrentTimeList As ListBox
 End Class

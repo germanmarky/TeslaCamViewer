@@ -73,6 +73,7 @@ Public Class MainForm
 
 
         Me.Size = New Size(1100, 600)
+        Me.MinimumSize = Me.Size
         Tv_ImgList.ImageSize = New Size(20, 20)
         Tv_Explorer.ImageList = Tv_ImgList
         Tv_Explorer.HideSelection = False
@@ -103,6 +104,10 @@ Public Class MainForm
 
         AddSpecialFolderRootNode(SpecialNodeFolders.Desktop)
         AddSpecialFolderRootNode(SpecialNodeFolders.MyDocuments)
+        AddSpecialFolderRootNode(SpecialNodeFolders.MyPictures)
+        AddSpecialFolderRootNode(SpecialNodeFolders.Recent)
+
+
         AddDriveRootNodes()
     End Sub
     Private Sub TV_Explorer_BeforeExpand(sender As Object, e As TreeViewCancelEventArgs) Handles Tv_Explorer.BeforeExpand
@@ -125,13 +130,22 @@ Public Class MainForm
 
     Private Sub TV_Explorer_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles Tv_Explorer.AfterSelect
         TxtBx_Path.Text = e.Node.Tag.ToString
+
+
+
+
+
         If e.Node.ImageKey.ToString() <> "Folder" Then
             Dim FileGroup As String
             FolderViewing = False
+
             Try
                 If TxtBx_Path.Text.Contains("recent-front") Or TxtBx_Path.Text.Contains("saved-front") Then
                     PlayersSTOP()
                     PlayerCenter.URL = TxtBx_Path.Text
+
+                    
+
                     PlayerCenter.settings.setMode("loop", True)
                     PlayerLeft.settings.setMode("loop", False)
                     PlayerRight.settings.setMode("loop", False)
@@ -154,6 +168,7 @@ Public Class MainForm
 
             End Try
         Else
+
             Try
 
                 FolderViewing = True
@@ -235,7 +250,7 @@ Public Class MainForm
     Private Sub AddChildNodes(tn As TreeNode, DirPath As String)
         Dim DirInfo As New DirectoryInfo(DirPath)
         Try
-            For Each di As DirectoryInfo In DirInfo.GetDirectories
+            For Each di As DirectoryInfo In DirInfo.GetDirectories.OrderByDescending(Function(p) p.Name).ToArray()
                 If Not (di.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
                     If di.FullName.ToString.Contains("TeslaCam") Then
 
@@ -257,18 +272,33 @@ Public Class MainForm
                 End If
 
             Next
-            For Each fi As FileInfo In DirInfo.GetFiles
-                If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
-                    Dim ImgKey As String = AddImageToImgList(fi.FullName)
-                    Dim FileNode As New TreeNode(fi.Name)
-                    With FileNode
-                        .Tag = fi.FullName
-                        .ImageKey = ImgKey
-                        .SelectedImageKey = ImgKey
-                    End With
-                    tn.Nodes.Add(FileNode)
-                End If
-            Next
+            If DirInfo.FullName.Contains("\Microsoft\Windows\Recent") Then
+                For Each fi As FileInfo In DirInfo.GetFiles.OrderByDescending(Function(p) p.LastAccessTime).ToArray()
+                    If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
+                        Dim ImgKey As String = AddImageToImgList(fi.FullName)
+                        Dim FileNode As New TreeNode(fi.Name)
+                        With FileNode
+                            .Tag = fi.FullName
+                            .ImageKey = ImgKey
+                            .SelectedImageKey = ImgKey
+                        End With
+                        tn.Nodes.Add(FileNode)
+                    End If
+                Next
+            Else
+                For Each fi As FileInfo In DirInfo.GetFiles.OrderByDescending(Function(p) p.Name).ToArray()
+                    If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
+                        Dim ImgKey As String = AddImageToImgList(fi.FullName)
+                        Dim FileNode As New TreeNode(fi.Name)
+                        With FileNode
+                            .Tag = fi.FullName
+                            .ImageKey = ImgKey
+                            .SelectedImageKey = ImgKey
+                        End With
+                        tn.Nodes.Add(FileNode)
+                    End If
+                Next
+            End If
         Catch ex As Exception
             MessageBox.Show(ex.Message, "Error...", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -409,7 +439,16 @@ Public Class MainForm
 
         End Try
 
-
+        If CurrentTimeList.SelectedIndex > 0 Then
+            ClipSelectUP.Enabled = True
+        Else
+            ClipSelectUP.Enabled = False
+        End If
+        If CurrentTimeList.SelectedIndex < CurrentTimeList.Items.Count - 1 Then
+            ClipSelectDOWN.Enabled = True
+        Else
+            ClipSelectDOWN.Enabled = False
+        End If
 
 
     End Sub
@@ -550,6 +589,15 @@ Public Class MainForm
         If PlayerCenter.playState = WMPLib.WMPPlayState.wmppsPlaying Then
             GroupBoxFRONT.BackColor = Color.Lime
             GroupBoxFRONT.Text = "Center - " & PlayerCenter.URL.ToString.Remove(0, PlayerCenter.URL.ToString.LastIndexOf("\") + 1)
+            For Each time In CurrentTimeList.Items
+                If PlayerCenter.URL.Remove(0, PlayerCenter.URL.LastIndexOf("\")).Contains("_" & time.ToString.Replace(":", "-")) Then
+                    CurrentTimeList.SelectedItem = time.ToString.Replace("-", ":")
+                    CurrentTimeList.Enabled = True
+                    If Tv_Explorer.Focused = False Then
+                        CurrentTimeList.Focus()
+                    End If
+                End If
+            Next
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsStopped Then
             GroupBoxFRONT.BackColor = Color.Red
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsScanForward Then
@@ -881,12 +929,21 @@ Public Class MainForm
 
     Private Sub Tv_Explorer_MouseMove(sender As Object, e As MouseEventArgs) Handles Tv_Explorer.MouseMove
         Dim Location As Point = MainForm.MousePosition - Me.Location
+        If Location.X + PREVIEWBox.Width + 75 > Me.Width Then
+            Location.X -= PREVIEWBox.Width + 50
+
+        Else
+            Location.X += 50
+        End If
+
         If Location.Y + PREVIEWBox.Height + 20 > Me.Height Then
             Location.Y -= Location.Y + PREVIEWBox.Height + 20 - Me.Height
-
+            Location.Y -= 45
+        Else
+            Location.Y -= 45
         End If
-        Location.X += 50
-        Location.Y -= 45
+
+
         PREVIEWBox.Location = Location
     End Sub
 
@@ -1092,4 +1149,76 @@ Public Class MainForm
 
     End Sub
 
+    Private Sub CurrentTimeList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CurrentTimeList.SelectedIndexChanged
+        If Not TxtBx_Path.Text.Remove(0, TxtBx_Path.Text.LastIndexOf("\")).Contains(CurrentTimeList.SelectedItem.ToString.Replace(":", "-")) And CurrentTimeList.SelectedItem <> Nothing Then
+            Dim di As New IO.DirectoryInfo(TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("\")))
+            Dim fis = di.GetFiles().OrderBy(Function(fi) fi.Name).ToArray()
+
+            For Each item In fis
+                If item.FullName.Remove(0, item.FullName.LastIndexOf("_")).Contains(CurrentTimeList.SelectedItem.Replace(":", "-")) Then
+                    TxtBx_Path.Text = item.FullName
+                    Dim FileGroup As String = TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("-"))
+                    PlayersSTOP()
+                    PlayerCenter.URL = (FileGroup & "-front.mp4")
+                    PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
+                    PlayerRight.URL = (FileGroup & "-right_repeater.mp4")
+                    'Tv_Explorer.
+                    PlayerCenter.settings.setMode("loop", True)
+                    PlayerLeft.settings.setMode("loop", True)
+                    PlayerRight.settings.setMode("loop", True)
+
+                    UpdatePlayBackSpeed()
+                    If Tv_Explorer.Focused = False Then
+                        CurrentTimeList.Focus()
+                    End If
+                    Exit For
+                End If
+            Next
+
+        End If
+
+    End Sub
+
+    Private Sub TxtBx_Path_TextChanged(sender As Object, e As EventArgs) Handles TxtBx_Path.TextChanged
+        CurrentTimeList.Enabled = False
+        CurrentTimeList.Items.Clear()
+        Dim Location As String = TxtBx_Path.Text
+        If Location.LastIndexOf("\") - Location.Length <> 0 Then
+            Location = Location.Remove(Location.LastIndexOf("\"))
+        End If
+
+        Dim DirInfo As New DirectoryInfo(Location)
+
+        For Each fi As FileInfo In DirInfo.GetFiles.OrderByDescending(Function(p) p.Name).ToArray()
+            If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
+                Dim fiTime As String = fi.Name.Remove(fi.Name.LastIndexOf("-"), fi.Name.Length - fi.Name.LastIndexOf("-"))
+                fiTime = fiTime.Remove(0, fiTime.IndexOf("_") + 1)
+
+                If Not CurrentTimeList.Items.Contains(fiTime.Replace("-", ":")) Then
+                    CurrentTimeList.Items.Add(fiTime.Replace("-", ":"))
+
+                End If
+            End If
+        Next
+
+    End Sub
+
+    Private Sub ClipSelectUP_Click(sender As Object, e As EventArgs) Handles ClipSelectUP.Click
+        If CurrentTimeList.SelectedIndex > 0 Then
+            CurrentTimeList.SelectedIndex -= 1
+        End If
+    End Sub
+
+    Private Sub ClipSelectDOWN_Click(sender As Object, e As EventArgs) Handles ClipSelectDOWN.Click
+        If CurrentTimeList.SelectedIndex < CurrentTimeList.Items.Count - 1 Then
+            CurrentTimeList.SelectedIndex += 1
+        End If
+    End Sub
+
+    Private Sub CurrentTimeList_KeyDown(sender As Object, e As KeyEventArgs) Handles CurrentTimeList.KeyDown
+        If e.KeyCode = Keys.Left Or e.KeyCode = Keys.Right Then
+            e.SuppressKeyPress = True
+            Return
+        End If
+    End Sub
 End Class

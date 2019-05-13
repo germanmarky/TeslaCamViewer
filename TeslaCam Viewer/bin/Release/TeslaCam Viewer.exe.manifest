@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="TeslaCam Viewer.exe" version="2019.19.1.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="TeslaCam Viewer.exe" version="2019.19.1.2" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <description asmv2:iconFile="favicon_32x32_hds_icon.ico" asmv2:publisher="Nate Mccomb" asmv2:product="TeslaCam Viewer" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="TeslaCam Viewer" version="2019.19.1.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="TeslaCam Viewer" version="2019.20.1.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="TeslaCam Viewer.exe" parameters="" />
   </entryPoint>
   <co.v1:useManifestForTrust xmlns="urn:schemas-microsoft-com:asm.v1" />
@@ -83,14 +83,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TeslaCam Viewer.exe" size="177080">
-      <assemblyIdentity name="TeslaCam Viewer" version="2019.19.1.0" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TeslaCam Viewer.exe" size="182200">
+      <assemblyIdentity name="TeslaCam Viewer" version="2019.20.1.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>mqnPjt5AH5a7vZ3qKugr6Xq4sEI=</dsig:DigestValue>
+        <dsig:DigestValue>SMl1c+7H0MCXlp9VXq0jDVfsKl8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
