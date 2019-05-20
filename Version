@@ -1,10 +1,12 @@
-2019.20.1.1
+2019.21.1.0
 Updates
 -------------
-Added Time Selection to Controls Window
-Added Previous/Next clip to Controls 
+Added Settings Reset(Hold SHIFT while launching) 21.1
+Added Time Selection to Controls Window - 20.1
+Added Previous/Next clip to Controls - 20.1
 …………………………………………………………….
 Bug Fixes 
 -------------
-Explorer - Sort files and folders by descending name (Newest files on top)
-Preview Window – Fixed display location if explorer is on right side
+Fixed major bug when selecting folders to view Sentry Mode triggered events - 21.1
+Explorer - Sort files and folders by descending name (Newest files on top) - 20.1
+Preview Window – Fixed display location if explorer is on right side - 20.1
