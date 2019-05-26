@@ -29,7 +29,7 @@ Features
 * Auto saved Layout and Custom folder location. 
 
           (Settings saved under: %homepath%\AppData\Local\Nate_Mccomb or Search: TeslaCam Viewer.exe.config)
-
+* Hold shift key while executing application to reset all settings.
 
 
 Known Bugs
