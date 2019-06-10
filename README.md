@@ -2,20 +2,20 @@
 A file viewer for TeslaCam
 
 
-[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer2019.20.1.png)](https://youtu.be/DXO11PsjMOY)
+[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/DXO11PsjMOY)
 
 Install
 ======================================
 I have included a precompiled version in the Binary folder for easy install.
 
 
-Version 2019.24.0.0-Beta
+Version 2019.24.1.0 - With Video Editor/Export Options
 ======================================
-[Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.24.0.0-Beta.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
+[Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.24.1.0.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
                     
-[Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.24.0.0-Beta.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
+[Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.24.1.0.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
-
+* Larger install files due to including FFmpeg for video editing
 
 Version 2019.21.1.0
 ======================================
@@ -40,9 +40,12 @@ Features
 
           (Settings saved under: %homepath%\AppData\Local\Nate_Mccomb or Search: TeslaCam Viewer.exe.config)
 * Hold shift key while executing application to reset all settings.
-
+* Join and Export clips in to one file
+* Choose from 5+ view layouts for exporting
+* Flip and/or mirror option for side cameras durring export
+* Trim video clips before saving file
 
 Known Bugs
 -------
-* Some TeslaCam .mp4 files get corrupt either while they are being saved or within the video itself. Some video playback windows may not populate due to this reason. 
+* This is a Tesla issue! - Some TeslaCam .mp4 files get corrupt either while they are being saved or within the video itself. Some video playback windows may not populate due to this reason. 
 
