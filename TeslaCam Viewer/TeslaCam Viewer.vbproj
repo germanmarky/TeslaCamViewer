@@ -14,6 +14,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,10 +25,12 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <SupportUrl>https://github.com/NateMccomb/TeslaCamViewer</SupportUrl>
+    <ErrorReportUrl>https://github.com/NateMccomb/TeslaCamViewer/issues</ErrorReportUrl>
     <ProductName>TeslaCam Viewer</ProductName>
     <PublisherName>Nate Mccomb</PublisherName>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>2019.19.1.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>2019.24.1.0</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -42,6 +45,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>TeslaCam Viewer.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,6 +56,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>TeslaCam Viewer.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -190,6 +195,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon_32x32_hds_icon.ico" />
+    <Content Include="Resources\ffmpeg.exe" />
+    <None Include="Resources\btn_donate_SM.gif" />
     <None Include="Resources\PayPalMe.png" />
     <None Include="Resources\InstaTwitterPurpleModel3.png" />
   </ItemGroup>

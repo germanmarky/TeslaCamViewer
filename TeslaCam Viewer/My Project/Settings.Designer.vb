@@ -125,6 +125,54 @@ Namespace My
                 Me("CustomDIR") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property RenderSelection() As Integer
+            Get
+                Return CType(Me("RenderSelection"),Integer)
+            End Get
+            Set
+                Me("RenderSelection") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property RenderQuality() As Integer
+            Get
+                Return CType(Me("RenderQuality"),Integer)
+            End Get
+            Set
+                Me("RenderQuality") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property FlipLR() As Boolean
+            Get
+                Return CType(Me("FlipLR"),Boolean)
+            End Get
+            Set
+                Me("FlipLR") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property MirrorLR() As Boolean
+            Get
+                Return CType(Me("MirrorLR"),Boolean)
+            End Get
+            Set
+                Me("MirrorLR") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

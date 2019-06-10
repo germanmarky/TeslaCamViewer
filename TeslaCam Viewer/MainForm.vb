@@ -19,9 +19,54 @@ Public Class MainForm
     Dim MoveGBFront As Boolean
     Dim MoveGBLeftRepeater As Boolean
     Dim MoveGBRightRepeater As Boolean
+
+    Dim CurrentVersion As String = Application.ProductVersion
+    Dim FullCenterCameraName = ""
+
+    Public SelectedNumberOfVideos As Integer = 0
+    Dim MoveRenderOut As Boolean = False
+    Dim MoveRenderIn As Boolean = False
+    Dim RenderOutputFile As String
+    Dim RenderFileCount As Integer = 0
+    Dim RenderFileCountNotDone As Integer = 0
+    Delegate Sub UpdateTextBoxDelg(text As String)
+    Public myDelegate As UpdateTextBoxDelg = New UpdateTextBoxDelg(AddressOf UpdateTextBox)
+    Dim RenderFirstPlay As Boolean = False
+    Dim RenderVideoLastPos As Double = 0
+    Dim RenderInTime As Integer = 0
+    Dim RenderOutTime As Integer = 0
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim CurrentVersion As String = Application.ProductVersion
-        Me.Text = Me.Text & CurrentVersion
+        System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = False
+        Me.Text = Me.Text & CurrentVersion '& " Beta"
+
+        RenderQuality.SelectedIndex = 0
+        If My.Computer.Keyboard.ShiftKeyDown = True Then
+            My.Settings.Reset()
+        End If
+
+
+        Select Case My.Settings.RenderSelection
+            Case 0
+                RadioButton1.Checked = True
+            Case 1
+                RadioButton2.Checked = True
+            Case 2
+                RadioButton3.Checked = True
+            Case 3
+                RadioButton4.Checked = True
+            Case 4
+                RadioButton5.Checked = True
+        End Select
+
+
+        RenderQuality.SelectedIndex = My.Settings.RenderQuality
+        FilpLREnable.Checked = My.Settings.FlipLR
+        MirrorLREnable.Checked = My.Settings.MirrorLR
+
+
+
+
+
         Dim MainToolTip As New Windows.Forms.ToolTip
         Try
             Dim request As System.Net.HttpWebRequest = System.Net.HttpWebRequest.Create("https://raw.githubusercontent.com/NateMccomb/TeslaCamViewer/master/Version")
@@ -65,7 +110,15 @@ Public Class MainForm
         MainToolTip.SetToolTip(PlayerCenter, "Right click for Fullscreen")
         MainToolTip.SetToolTip(PlayerLeft, "Right click for Fullscreen")
         MainToolTip.SetToolTip(PlayerRight, "Right click for Fullscreen")
-
+        MainToolTip.SetToolTip(RenderFileProgress, "Processing number of files")
+        MainToolTip.SetToolTip(ThreadsRunningLabel, "Number of threads running")
+        MainToolTip.SetToolTip(RenderPlayerTimecode, "Current Timecode")
+        MainToolTip.SetToolTip(RenderInTimeLabel, "Save As Start Point" & vbCrLf & "Right click to set at current timecode")
+        MainToolTip.SetToolTip(RenderOutTimeLabel, "Save As End Point" & vbCrLf & "Right click to set at current timecode")
+        MainToolTip.SetToolTip(RenderTotalTimeLabel, "Save As File Length")
+        MainToolTip.SetToolTip(RenderInTimeGraphic, "In Point Marker" & vbCrLf & "Right click to enable move / set timecode position")
+        MainToolTip.SetToolTip(RenderOutTimeGraphic, "Out Point Marker" & vbCrLf & "Right click to enable move / set timecode position")
+        MainToolTip.SetToolTip(FFmpegOutput, "FFmpeg Output Console Window")
 
 
         MainToolTip.Active = True
@@ -75,6 +128,8 @@ Public Class MainForm
         Me.Size = New Size(1100, 600)
         Me.MinimumSize = Me.Size
         Tv_ImgList.ImageSize = New Size(20, 20)
+        GroupBoxRENDER.Size = New Size(Me.Width - 60, Me.Height - 50 - 30)
+        GroupBoxRENDER.Location = New Point(25, 25)
         Tv_Explorer.ImageList = Tv_ImgList
         Tv_Explorer.HideSelection = False
 
@@ -84,12 +139,16 @@ Public Class MainForm
         PlayerLeft.uiMode = "none"
         PlayerRight.uiMode = "none"
         PlayerPreview.uiMode = "none"
+        PlayerRender.uiMode = "none"
+
         PlayerCenter.Ctlenabled = False
         PlayerLeft.Ctlenabled = False
         PlayerRight.Ctlenabled = False
         PlayerPreview.Ctlenabled = False
+        PlayerRender.Ctlenabled = False
 
         TrackBar1.Minimum = 0
+
 
     End Sub
     Private Sub RefreshRootNodes()
@@ -129,28 +188,46 @@ Public Class MainForm
 
 
     Private Sub TV_Explorer_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles Tv_Explorer.AfterSelect
-        TxtBx_Path.Text = e.Node.Tag.ToString
+        FullCenterCameraName = e.Node.Tag.ToString
+        CurrentTimeList.Enabled = False
+        CurrentTimeList.Items.Clear()
+        Try
+            Dim DIRLocation As String = FullCenterCameraName
 
+            If DIRLocation.Contains(".mp4") Then
+                DIRLocation = DIRLocation.Remove(DIRLocation.LastIndexOf("\"))
+            End If
 
+            Dim DirInfo As New DirectoryInfo(DIRLocation)
 
+            For Each fi As FileInfo In DirInfo.GetFiles.OrderByDescending(Function(p) p.Name).ToArray()
+                If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
+                    Dim fiTime As String = fi.Name.Remove(fi.Name.LastIndexOf("-"), fi.Name.Length - fi.Name.LastIndexOf("-"))
+                    fiTime = fiTime.Remove(0, fiTime.IndexOf("_") + 1)
 
+                    If Not CurrentTimeList.Items.Contains(fiTime.Replace("-", ":")) Then
+                        CurrentTimeList.Items.Add(fiTime.Replace("-", ":"))
+
+                    End If
+                End If
+            Next
+
+        Catch ex As Exception
+
+        End Try
 
         If e.Node.ImageKey.ToString() <> "Folder" Then
             Dim FileGroup As String
             FolderViewing = False
-
             Try
-                If TxtBx_Path.Text.Contains("recent-front") Or TxtBx_Path.Text.Contains("saved-front") Then
+                If FullCenterCameraName.Contains("recent-front") Or FullCenterCameraName.Contains("saved-front") Then
                     PlayersSTOP()
-                    PlayerCenter.URL = TxtBx_Path.Text
-
-                    
-
+                    PlayerCenter.URL = FullCenterCameraName
                     PlayerCenter.settings.setMode("loop", True)
                     PlayerLeft.settings.setMode("loop", False)
                     PlayerRight.settings.setMode("loop", False)
                 Else
-                    FileGroup = TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("-"))
+                    FileGroup = FullCenterCameraName.Remove(FullCenterCameraName.LastIndexOf("-"))
                     PlayersSTOP()
                     PlayerCenter.URL = (FileGroup & "-front.mp4")
                     PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
@@ -159,7 +236,7 @@ Public Class MainForm
                     PlayerCenter.settings.setMode("loop", True)
                     PlayerLeft.settings.setMode("loop", True)
                     PlayerRight.settings.setMode("loop", True)
-
+                    FullCenterCameraName = (FileGroup & "-front.mp4")
                     UpdatePlayBackSpeed()
                 End If
                 PREVIEWBox.Visible = False
@@ -168,18 +245,16 @@ Public Class MainForm
 
             End Try
         Else
-
             Try
-
                 FolderViewing = True
                 PlayersSTOP()
                 PlayerCenter.settings.setMode("loop", False)
                 PlayerLeft.settings.setMode("loop", False)
                 PlayerRight.settings.setMode("loop", False)
 
-                Dim di As New IO.DirectoryInfo(TxtBx_Path.Text)
-                Dim fis = di.GetFiles().OrderBy(Function(fi) fi.Name.Contains("front")).ToArray()
-                Dim a = fis.GetValue(fis.Length - 1)
+                Dim di As New IO.DirectoryInfo(FullCenterCameraName)
+                Dim fis = di.GetFiles("*front.mp4").OrderByDescending(Function(p) p.Name).ToArray() '(Function(fi) fi.Name.Contains("front")).ToArray()
+                Dim a = fis.GetValue(0)
 
                 Dim FileGroup As String
 
@@ -189,14 +264,7 @@ Public Class MainForm
             Catch ex As Exception
 
             End Try
-
-
-
         End If
-
-
-
-
     End Sub
 
     Private Sub AddSpecialFolderRootNode(SpecialFolder As SpecialNodeFolders)
@@ -324,20 +392,20 @@ Public Class MainForm
         Next
     End Sub
 
-    Private Function AddImageToImgList(FullPath As String, Optional SpecialImageKeyName As String = "") As String
-        Dim ImgKey As String = If(SpecialImageKeyName = "", FullPath, SpecialImageKeyName)
+    Private Function AddImageToImgList(FullFilePath As String, Optional SpecialImageKeyName As String = "") As String
+        Dim ImgKey As String = If(SpecialImageKeyName = "", FullFilePath, SpecialImageKeyName)
         Dim LoadFromExt As Boolean = False
 
-        If ImgKey = FullPath AndAlso File.Exists(FullPath) Then
-            Dim ext As String = Path.GetExtension(FullPath).ToLower
+        If ImgKey = FullFilePath AndAlso File.Exists(FullFilePath) Then
+            Dim ext As String = Path.GetExtension(FullFilePath).ToLower
             If ext <> "" AndAlso ext <> ".exe" AndAlso ext <> ".lnk" AndAlso ext <> ".url" Then
-                ImgKey = Path.GetExtension(FullPath).ToLower
+                ImgKey = Path.GetExtension(FullFilePath).ToLower
                 LoadFromExt = True
             End If
         End If
 
         If Not Tv_ImgList.Images.Keys.Contains(ImgKey) Then
-            Tv_ImgList.Images.Add(ImgKey, Iconhelper.GetIconImage(If(LoadFromExt, ImgKey, FullPath), IconSizes.Large32x32))
+            Tv_ImgList.Images.Add(ImgKey, Iconhelper.GetIconImage(If(LoadFromExt, ImgKey, FullFilePath), IconSizes.Large32x32))
         End If
 
         Return ImgKey
@@ -406,32 +474,27 @@ Public Class MainForm
                 TCLabelMin.Text = "0"
             End If
 
+            If Int(PlayerRender.currentMedia.duration) <> 0 Then
+                RenderTimeline.Value = Int(PlayerRender.Ctlcontrols.currentPosition * 10)
+            End If
+
         Catch ex As Exception
 
         End Try
-
-
         Try
             If PlayerCenter.playState = WMPLib.WMPPlayState.wmppsStopped Then
-                If FolderViewing = True And LastFolderFile = False Then
+                If FolderViewing = True Then ' And LastFolderFile = False
                     LastFolderFile = True
-
-                    Dim di As New IO.DirectoryInfo(TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("\")))
-                    Dim fis = di.GetFiles().OrderBy(Function(fi) fi.Name.Contains("front")).ToArray()
-                    Dim a = fis.GetValue(fis.Length - 1)
-
-                    Dim FileGroup As String
-
-                    TxtBx_Path.Text = a.Fullname.ToString
-                    FileGroup = TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("-"))
-                    'PlayerCenter.Ctlcontrols.play()
-
                     PlayersSTOP()
-                    PlayerCenter.URL = (FileGroup & "-front.mp4")
-                    PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
-                    PlayerRight.URL = (FileGroup & "-right_repeater.mp4")
-                    'PlayerCenter.Ctlcontrols.play()
-
+                    If CurrentTimeList.SelectedIndex > 0 Then
+                        Dim LastIndex As Integer = CurrentTimeList.SelectedIndex
+                        CurrentTimeList.SelectedIndices.Clear()
+                        CurrentTimeList.SelectedIndex = LastIndex - 1
+                    Else
+                        CurrentTimeList.SelectedIndices.Clear()
+                        CurrentTimeList.SelectedIndex = CurrentTimeList.Items.Count - 1
+                    End If
+                    PlayersPLAY()
                     UpdatePlayBackSpeed()
                 End If
             End If
@@ -450,6 +513,60 @@ Public Class MainForm
             ClipSelectDOWN.Enabled = False
         End If
 
+        If GroupBoxRENDER.Visible = True Then
+            Dim StartMin As Integer = 0
+            Dim StartSec As Double = 0
+            Dim TotalTimeMin As Double = 0
+            Dim TotalTimeSec As Double = 0
+            Dim EndMin As Integer = 0
+            Dim EndSec As Double = 0
+            Dim PlayerMin As Double = 0
+            Dim playerSec As Double = 0
+
+            If RenderInTime > 599 Then
+                Dim TempTime As Integer = RenderInTime
+                For i = 1 To RenderInTime / 600
+                    StartMin += 1
+                    TempTime -= 600
+                Next
+                StartSec = TempTime / 10
+            Else
+                'StartMin = 0
+                StartSec = RenderInTime / 10
+            End If
+            If RenderOutTime > 599 Then
+                Dim TempTime As Integer = RenderOutTime
+                For i = 1 To RenderOutTime / 600
+                    EndMin += 1
+                    TempTime -= 600
+                Next
+                EndSec = TempTime / 10
+            Else
+                'EndMin = 0
+                EndSec = RenderOutTime / 10
+            End If
+            TotalTimeMin = EndMin - StartMin
+            TotalTimeSec = EndSec - StartSec
+            If TotalTimeSec < 0 Then
+                TotalTimeMin -= 1
+                TotalTimeSec = Math.Abs(EndSec)
+            End If
+            RenderInTimeLabel.Text = StartMin.ToString("00") & ":" & StartSec.ToString("00.00")
+            RenderOutTimeLabel.Text = EndMin.ToString("00") & ":" & EndSec.ToString("00.00")
+            RenderTotalTimeLabel.Text = TotalTimeMin.ToString("00") & ":" & TotalTimeSec.ToString("00.00")
+            If PlayerRender.Ctlcontrols.currentPosition > 59.9 Then
+                Dim TempTime As Integer = PlayerRender.Ctlcontrols.currentPosition
+                For i = 1 To TempTime / 60
+                    PlayerMin += 1
+                    TempTime -= 60
+                Next
+                playerSec = TempTime
+            Else
+                'StartMin = 0
+                playerSec = PlayerRender.Ctlcontrols.currentPosition
+            End If
+            RenderPlayerTimecode.Text = PlayerMin.ToString("00") & ":" & playerSec.ToString("00.00")
+        End If
 
     End Sub
 
@@ -485,41 +602,33 @@ Public Class MainForm
     End Sub
 
     Private Sub PlayerCenter_OpenStateChange(sender As Object, e As _WMPOCXEvents_OpenStateChangeEvent) Handles PlayerCenter.OpenStateChange
-
         Try
             If PlayerCenter.playState = WMPLib.WMPPlayState.wmppsPlaying Then
                 If PlayerLeft.currentMedia.duration Or PlayerRight.currentMedia.duration <= PlayerCenter.currentMedia.duration Then
                     TrackBar1.Maximum = PlayerCenter.currentMedia.duration
                     TCLabelMax.Text = TrackBar1.Maximum
                 End If
-
             End If
-
-
         Catch ex As Exception
 
         End Try
-
-
-
-
-
-
     End Sub
 
 
     Private Sub MediaInfo_OpenStateChange(sender As Object, e As _WMPOCXEvents_OpenStateChangeEvent) Handles PlayerMediaInfo.OpenStateChange
-
         Try
             If PlayerMediaInfo.playState = WMPLib.WMPPlayState.wmppsPlaying Then
-                Dim di As New IO.DirectoryInfo(TxtBx_Path.Text)
-                Dim fis = di.GetFiles().OrderBy(Function(fi) fi.Name.Contains("front")).ToArray()
-                Dim a = fis.GetValue(fis.Length - 2)
+                Dim di As New IO.DirectoryInfo(FullCenterCameraName)
+                Dim fis = di.GetFiles("*front.mp4").OrderByDescending(Function(p) p.Name).ToArray()
+                Dim a = fis.GetValue(0)
+                If fis.Length > 1 Then
+                    a = fis.GetValue(1)
+                End If
 
                 Dim FileGroup As String
 
-                TxtBx_Path.Text = a.Fullname.ToString
-                FileGroup = TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("-"))
+                FullCenterCameraName = a.Fullname.ToString
+                FileGroup = FullCenterCameraName.Remove(FullCenterCameraName.LastIndexOf("-"))
                 PlayersSTOP()
                 PlayerCenter.URL = (FileGroup & "-front.mp4")
                 PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
@@ -545,7 +654,7 @@ Public Class MainForm
         ElseIf PlayerLeft.playState = WMPLib.WMPPlayState.wmppsScanForward Then
             GroupBoxLEFTREPEATER.BackColor = Color.Blue
         ElseIf PlayerLeft.playState = WMPLib.WMPPlayState.wmppsPaused Then
-            GroupBoxLEFTREPEATER.BackColor = Color.Yellow
+            GroupBoxLEFTREPEATER.BackColor = Me.BackColor
         ElseIf PlayerLeft.playState = WMPLib.WMPPlayState.wmppsReady Then
             GroupBoxLEFTREPEATER.BackColor = Color.LightGray
         ElseIf PlayerLeft.playState = WMPLib.WMPPlayState.wmppsTransitioning Then
@@ -569,7 +678,7 @@ Public Class MainForm
         ElseIf PlayerRight.playState = WMPLib.WMPPlayState.wmppsScanForward Then
             GroupBoxRIGHTREPEATER.BackColor = Color.Blue
         ElseIf PlayerRight.playState = WMPLib.WMPPlayState.wmppsPaused Then
-            GroupBoxRIGHTREPEATER.BackColor = Color.Yellow
+            GroupBoxRIGHTREPEATER.BackColor = Me.BackColor
         ElseIf PlayerRight.playState = WMPLib.WMPPlayState.wmppsReady Then
             GroupBoxRIGHTREPEATER.BackColor = Color.LightGray
         ElseIf PlayerRight.playState = WMPLib.WMPPlayState.wmppsTransitioning Then
@@ -591,7 +700,14 @@ Public Class MainForm
             GroupBoxFRONT.Text = "Center - " & PlayerCenter.URL.ToString.Remove(0, PlayerCenter.URL.ToString.LastIndexOf("\") + 1)
             For Each time In CurrentTimeList.Items
                 If PlayerCenter.URL.Remove(0, PlayerCenter.URL.LastIndexOf("\")).Contains("_" & time.ToString.Replace(":", "-")) Then
+                    CurrentTimeList.SelectedIndices.Clear()
                     CurrentTimeList.SelectedItem = time.ToString.Replace("-", ":")
+                    If CurrentTimeList.SelectedIndex < 3 Then
+                        CurrentTimeList.TopIndex = 0
+                    Else
+                        CurrentTimeList.TopIndex = CurrentTimeList.SelectedIndex - 2
+                    End If
+
                     CurrentTimeList.Enabled = True
                     If Tv_Explorer.Focused = False Then
                         CurrentTimeList.Focus()
@@ -603,7 +719,7 @@ Public Class MainForm
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsScanForward Then
             GroupBoxFRONT.BackColor = Color.Blue
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsPaused Then
-            GroupBoxFRONT.BackColor = Color.Yellow
+            GroupBoxFRONT.BackColor = Me.BackColor
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsReady Then
             GroupBoxFRONT.BackColor = Color.LightGray
         ElseIf PlayerCenter.playState = WMPLib.WMPPlayState.wmppsTransitioning Then
@@ -617,7 +733,13 @@ Public Class MainForm
             GroupBoxFRONT.Text = "Center Repeater - " & PlayerCenter.URL.ToString.Remove(0, PlayerCenter.URL.ToString.LastIndexOf("\") + 1) & " - ERROR"
         End If
     End Sub
+    Private Sub PlayersPAUSE()
+        UpdatePlayBackSpeed()
+        PlayerCenter.Ctlcontrols.pause()
+        PlayerLeft.Ctlcontrols.pause()
+        PlayerRight.Ctlcontrols.pause()
 
+    End Sub
     Private Sub PlayersPLAY()
         If PlayerLeft.playState = WMPLib.WMPPlayState.wmppsPlaying Or PlayerCenter.playState = WMPLib.WMPPlayState.wmppsPlaying Or PlayerRight.playState = WMPLib.WMPPlayState.wmppsPlaying Then
             UpdatePlayBackSpeed()
@@ -668,7 +790,6 @@ Public Class MainForm
     End Sub
 
     Public Sub UpdateCustomFolder(folderpath As String)
-
         If Directory.Exists(folderpath) Or folderpath = "Custom Folder" Then
             Dim FolderName As String = New DirectoryInfo(folderpath).Name
             If folderpath <> "Custom Folder" Then
@@ -690,21 +811,13 @@ Public Class MainForm
             End Try
 
             Try
-                    Tv_Explorer.Nodes.Item(0).Remove()
-                Catch ex As Exception
+                Tv_Explorer.Nodes.Item(0).Remove()
+            Catch ex As Exception
 
-                End Try
+            End Try
 
-                Tv_Explorer.Nodes.Insert(0, rootNode)
-                If Tv_Explorer.Nodes.Count > 0 Then
-
-                End If
-
-
-
-
-
-            End If
+            Tv_Explorer.Nodes.Insert(0, rootNode)
+        End If
     End Sub
     Private Sub Tv_Explorer_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles Tv_Explorer.NodeMouseClick
         If e.Button = MouseButtons.Right Then
@@ -727,7 +840,6 @@ Public Class MainForm
 
 
     End Sub
-
 
     Private Sub BtnPLAY_Click(sender As Object, e As EventArgs) Handles BtnPLAY.Click
         PlayersPLAY()
@@ -803,7 +915,8 @@ Public Class MainForm
         Else
             GroupBoxEXPLORER.Location = ReturnSavedLocation(My.Settings.LocationExplorer)
         End If
-
+        GroupBoxSettings.Size = GroupBoxControlsWindow.Size
+        GroupBoxSettings.Location = GroupBoxControlsWindow.Location
 
         Tv_Explorer.Refresh()
 
@@ -827,83 +940,132 @@ Public Class MainForm
         Return none
     End Function
 
-
     Private Sub MainForm_KeyPress(sender As Object, e As KeyPressEventArgs) Handles Me.KeyPress
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Space) Or e.KeyChar = "p" Or e.KeyChar = "P" Then
-            If BtnPLAY.Focused = False And BtnPAUSE.Focused = False Then
-                PlayersPLAY()
+        If GroupBoxRENDER.Visible = False Then
+            If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Space) Or e.KeyChar = "p" Or e.KeyChar = "P" Then
+                If BtnPLAY.Focused = False And BtnPAUSE.Focused = False Then
+                    PlayersPLAY()
+                End If
+                e.Handled = True
             End If
-            e.Handled = True
-        End If
-        If e.KeyChar = "," Or e.KeyChar = "<" Then
-            If TrackBar1.Value > TrackBar1.Minimum Then
-                PlayerCenter.Ctlcontrols.currentPosition -= 1
-                PlayerLeft.Ctlcontrols.currentPosition -= 1
-                PlayerRight.Ctlcontrols.currentPosition -= 1
-                RefreshPlayers()
+            If e.KeyChar = "," Or e.KeyChar = "<" Then
+                If TrackBar1.Value > TrackBar1.Minimum Then
+                    PlayerCenter.Ctlcontrols.currentPosition -= 1
+                    PlayerLeft.Ctlcontrols.currentPosition -= 1
+                    PlayerRight.Ctlcontrols.currentPosition -= 1
+                    RefreshPlayers()
+                End If
+                e.Handled = True
             End If
-            e.Handled = True
-        End If
-        If e.KeyChar = "m" Or e.KeyChar = "M" Then
-            If TrackBar1.Value > TrackBar1.Minimum Then
-                PlayerCenter.Ctlcontrols.currentPosition -= 1 / 36.02
-                PlayerLeft.Ctlcontrols.currentPosition -= 1 / 36.02
-                PlayerRight.Ctlcontrols.currentPosition -= 1 / 36.02
-                RefreshPlayers()
+            If e.KeyChar = "m" Or e.KeyChar = "M" Then
+                If TrackBar1.Value > TrackBar1.Minimum Then
+                    PlayerCenter.Ctlcontrols.currentPosition -= 1 / 36.02
+                    PlayerLeft.Ctlcontrols.currentPosition -= 1 / 36.02
+                    PlayerRight.Ctlcontrols.currentPosition -= 1 / 36.02
+                    RefreshPlayers()
+                End If
+                e.Handled = True
             End If
-            e.Handled = True
-        End If
-        If e.KeyChar = "." Or e.KeyChar = ">" Then
-            If TrackBar1.Value < TrackBar1.Maximum Then
-                PlayerCenter.Ctlcontrols.currentPosition += 1
-                PlayerLeft.Ctlcontrols.currentPosition += 1
-                PlayerRight.Ctlcontrols.currentPosition += 1
-                RefreshPlayers()
+            If e.KeyChar = "." Or e.KeyChar = ">" Then
+                If TrackBar1.Value < TrackBar1.Maximum Then
+                    PlayerCenter.Ctlcontrols.currentPosition += 1
+                    PlayerLeft.Ctlcontrols.currentPosition += 1
+                    PlayerRight.Ctlcontrols.currentPosition += 1
+                    RefreshPlayers()
+                End If
+                e.Handled = True
             End If
-            e.Handled = True
-        End If
-        If e.KeyChar = "/" Or e.KeyChar = "?" Then
-            If TrackBar1.Value < TrackBar1.Maximum Then
-                PlayerCenter.Ctlcontrols.currentPosition += 1 / 36.02
-                PlayerLeft.Ctlcontrols.currentPosition += 1 / 36.02
-                PlayerRight.Ctlcontrols.currentPosition += 1 / 36.02
-                RefreshPlayers()
+            If e.KeyChar = "/" Or e.KeyChar = "?" Then
+                If TrackBar1.Value < TrackBar1.Maximum Then
+                    PlayerCenter.Ctlcontrols.currentPosition += 1 / 36.02
+                    PlayerLeft.Ctlcontrols.currentPosition += 1 / 36.02
+                    PlayerRight.Ctlcontrols.currentPosition += 1 / 36.02
+                    RefreshPlayers()
+                End If
+                e.Handled = True
             End If
-            e.Handled = True
-        End If
-        If e.KeyChar = "-" Or e.KeyChar = "_" Then
-            If TrackBar2.Value > TrackBar2.Minimum Then
-                TrackBar2.Value -= 1
+            If e.KeyChar = "-" Or e.KeyChar = "_" Then
+                If TrackBar2.Value > TrackBar2.Minimum Then
+                    TrackBar2.Value -= 1
+                End If
+                UpdatePlayBackSpeed()
+                e.Handled = True
             End If
-            UpdatePlayBackSpeed()
-            e.Handled = True
-        End If
-        If e.KeyChar = "=" Or e.KeyChar = "+" Then
-            If TrackBar2.Value < TrackBar2.Maximum Then
-                TrackBar2.Value += 1
+            If e.KeyChar = "=" Or e.KeyChar = "+" Then
+                If TrackBar2.Value < TrackBar2.Maximum Then
+                    TrackBar2.Value += 1
+                End If
+                UpdatePlayBackSpeed()
+                e.Handled = True
             End If
-            UpdatePlayBackSpeed()
-            e.Handled = True
+            If e.KeyChar = "s" Or e.KeyChar = "S" Then
+                PlayerCenter.Ctlcontrols.stop()
+                PlayerLeft.Ctlcontrols.stop()
+                PlayerRight.Ctlcontrols.stop()
+                e.Handled = True
+            End If
+            If e.KeyChar = "r" Or e.KeyChar = "R" Then
+                PlayerCenter.Ctlcontrols.fastReverse()
+                PlayerLeft.Ctlcontrols.fastReverse()
+                PlayerRight.Ctlcontrols.fastReverse()
+                e.Handled = True
+            End If
+            If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Escape) Or e.KeyChar = "f" Or e.KeyChar = "F" Then
+                PlayerCenter.fullScreen = False
+                PlayerLeft.fullScreen = False
+                PlayerRight.fullScreen = False
+                e.Handled = True
+            End If
+        Else
+            If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Space) Or e.KeyChar = "p" Or e.KeyChar = "P" Then
+                If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused Then
+                    PlayerRender.Ctlcontrols.play()
+                Else
+                    PlayerRender.Ctlcontrols.pause()
+                End If
+                e.Handled = True
+            End If
+            If e.KeyChar = "," Or e.KeyChar = "<" Then
+                If RenderTimeline.Value > RenderTimeline.Minimum Then
+                    PlayerRender.Ctlcontrols.currentPosition -= 1
+                    If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused Then
+                        PlayerRender.Ctlcontrols.play()
+                        PlayerRender.Ctlcontrols.pause()
+                    End If
+                End If
+                e.Handled = True
+            End If
+            If e.KeyChar = "m" Or e.KeyChar = "M" Then
+                If RenderTimeline.Value > RenderTimeline.Minimum Then
+                    PlayerRender.Ctlcontrols.currentPosition -= 1 / 36.02
+                    If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused Then
+                        PlayerRender.Ctlcontrols.play()
+                        PlayerRender.Ctlcontrols.pause()
+                    End If
+                End If
+                e.Handled = True
+            End If
+            If e.KeyChar = "." Or e.KeyChar = ">" Or e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Right) Then
+                If RenderTimeline.Value < RenderTimeline.Maximum Then
+                    PlayerRender.Ctlcontrols.currentPosition += 1
+                    If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused Then
+                        PlayerRender.Ctlcontrols.play()
+                        PlayerRender.Ctlcontrols.pause()
+                    End If
+                End If
+                e.Handled = True
+            End If
+            If e.KeyChar = "/" Or e.KeyChar = "?" Or e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Left) Then
+                If RenderTimeline.Value < RenderTimeline.Maximum Then
+                    PlayerRender.Ctlcontrols.currentPosition += 1 / 36.02
+                    If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused Then
+                        PlayerRender.Ctlcontrols.play()
+                        PlayerRender.Ctlcontrols.pause()
+                    End If
+                End If
+                e.Handled = True
+            End If
         End If
-        If e.KeyChar = "s" Or e.KeyChar = "S" Then
-            PlayerCenter.Ctlcontrols.stop()
-            PlayerLeft.Ctlcontrols.stop()
-            PlayerRight.Ctlcontrols.stop()
-            e.Handled = True
-        End If
-        If e.KeyChar = "r" Or e.KeyChar = "R" Then
-            PlayerCenter.Ctlcontrols.fastReverse()
-            PlayerLeft.Ctlcontrols.fastReverse()
-            PlayerRight.Ctlcontrols.fastReverse()
-            e.Handled = True
-        End If
-        If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Escape) Or e.KeyChar = "f" Or e.KeyChar = "F" Then
-            PlayerCenter.fullScreen = False
-            PlayerLeft.fullScreen = False
-            PlayerRight.fullScreen = False
-            e.Handled = True
-        End If
-
     End Sub
 
     Private Sub Tv_Explorer_NodeMouseHover(sender As Object, e As TreeNodeMouseHoverEventArgs) Handles Tv_Explorer.NodeMouseHover
@@ -931,7 +1093,6 @@ Public Class MainForm
         Dim Location As Point = MainForm.MousePosition - Me.Location
         If Location.X + PREVIEWBox.Width + 75 > Me.Width Then
             Location.X -= PREVIEWBox.Width + 50
-
         Else
             Location.X += 50
         End If
@@ -942,11 +1103,8 @@ Public Class MainForm
         Else
             Location.Y -= 45
         End If
-
-
         PREVIEWBox.Location = Location
     End Sub
-
 
     Private Sub PlayerPreview_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles PlayerPreview.PlayStateChange
         If PlayerPreview.playState = WMPLib.WMPPlayState.wmppsPlaying Then
@@ -972,9 +1130,7 @@ Public Class MainForm
         End If
     End Sub
 
-
     Private Function FindDropPoint(ByVal CurrentPoint As Point)
-
         Dim gbSize As Point
         gbSize.X = Me.Width / 3 - 4
         gbSize.Y = (Me.Height - 40) / 2
@@ -1016,7 +1172,6 @@ Public Class MainForm
     End Function
 
     Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
-
         If MoveGBExplorer = True Then
             GroupBoxEXPLORER.Location = FindDropPoint(e.Location)
             My.Settings.LocationExplorer = ReturnLocationToSave(GroupBoxEXPLORER.Location)
@@ -1038,8 +1193,6 @@ Public Class MainForm
             My.Settings.LocationRightRepeater = ReturnLocationToSave(GroupBoxRIGHTREPEATER.Location)
             MoveGBRightRepeater = False
         End If
-
-
     End Sub
 
     Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -1063,7 +1216,6 @@ Public Class MainForm
         End If
     End Sub
 
-
     Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.LocationExplorer = ReturnLocationToSave(GroupBoxEXPLORER.Location)
         My.Settings.LocationControls = ReturnLocationToSave(GroupBoxCONTROLS.Location)
@@ -1071,8 +1223,23 @@ Public Class MainForm
         My.Settings.LocationFront = ReturnLocationToSave(GroupBoxFRONT.Location)
         My.Settings.LocationLeftRepeater = ReturnLocationToSave(GroupBoxLEFTREPEATER.Location)
         My.Settings.LocationExplorer = ReturnLocationToSave(GroupBoxEXPLORER.Location)
-    End Sub
+        Try
+            Dim a As Integer = 0
+            For Each PRunning As Process In System.Diagnostics.Process.GetProcessesByName("ffmpeg")
+                PRunning.Kill()
+                a += 1
+            Next
+            'MessageBox.Show("Killed " & a & " Processes ", "Kill Process", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Catch ex As Exception
 
+        End Try
+        Try
+            Dim a As String = Path.GetTempPath() & "TeslaCamViewer\"
+            System.IO.Directory.Delete(Path.GetTempPath() & "TeslaCamViewer\", True)
+        Catch ex As Exception
+            'MessageBox.Show("Unable to delete temp folder: " & vbCrLf & ex.Message, "Error ", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 
     Private Sub GroupBoxEXPLORER_MouseDown(sender As Object, e As MouseEventArgs) Handles GroupBoxEXPLORER.MouseDown
         Dim Location As Point = MainForm.MousePosition - Me.Location
@@ -1120,7 +1287,7 @@ Public Class MainForm
     End Sub
 
     Private Sub Donation_Click(sender As Object, e As EventArgs) Handles Donation.Click
-        Process.Start("https://paypal.me/NateMccomb")
+        Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url") 'https://paypal.me/NateMccomb")
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -1141,77 +1308,61 @@ Public Class MainForm
         Process.Start("https://github.com/NateMccomb/TeslaCamViewer")
     End Sub
 
-
-    Private Sub PlayerCenter_KeyPressEvent(sender As Object, e As _WMPOCXEvents_KeyPressEvent) Handles PlayerCenter.KeyPressEvent
-        If e.nKeyAscii.ToString = "" Then
-
-        End If
-
-    End Sub
-
     Private Sub CurrentTimeList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CurrentTimeList.SelectedIndexChanged
-        If Not TxtBx_Path.Text.Remove(0, TxtBx_Path.Text.LastIndexOf("\")).Contains(CurrentTimeList.SelectedItem.ToString.Replace(":", "-")) And CurrentTimeList.SelectedItem <> Nothing Then
-            Dim di As New IO.DirectoryInfo(TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("\")))
-            Dim fis = di.GetFiles().OrderBy(Function(fi) fi.Name).ToArray()
+        If CurrentTimeList.SelectedItem <> Nothing Then
+            If CurrentTimeList.SelectedItems.Count = 1 Then
+                If Not FullCenterCameraName.Remove(0, FullCenterCameraName.LastIndexOf("\")).Contains(CurrentTimeList.SelectedItem.ToString.Replace(":", "-")) Then
+                    Dim di As New IO.DirectoryInfo(FullCenterCameraName.Remove(FullCenterCameraName.LastIndexOf("\")))
+                    Dim fis = di.GetFiles().OrderByDescending(Function(p) p.Name).ToArray()
+                    For Each item In fis
+                        If item.FullName.Remove(0, item.FullName.LastIndexOf("_")).Contains(CurrentTimeList.SelectedItem.Replace(":", "-")) Then
+                            FullCenterCameraName = item.FullName
+                            Dim FileGroup As String = FullCenterCameraName.Remove(FullCenterCameraName.LastIndexOf("-"))
+                            PlayersSTOP()
+                            PlayerCenter.URL = (FileGroup & "-front.mp4")
+                            PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
+                            PlayerRight.URL = (FileGroup & "-right_repeater.mp4")
+                            'Tv_Explorer.
+                            PlayerCenter.settings.setMode("loop", False)
+                            PlayerLeft.settings.setMode("loop", False)
+                            PlayerRight.settings.setMode("loop", False)
 
-            For Each item In fis
-                If item.FullName.Remove(0, item.FullName.LastIndexOf("_")).Contains(CurrentTimeList.SelectedItem.Replace(":", "-")) Then
-                    TxtBx_Path.Text = item.FullName
-                    Dim FileGroup As String = TxtBx_Path.Text.Remove(TxtBx_Path.Text.LastIndexOf("-"))
-                    PlayersSTOP()
-                    PlayerCenter.URL = (FileGroup & "-front.mp4")
-                    PlayerLeft.URL = (FileGroup & "-left_repeater.mp4")
-                    PlayerRight.URL = (FileGroup & "-right_repeater.mp4")
-                    'Tv_Explorer.
-                    PlayerCenter.settings.setMode("loop", True)
-                    PlayerLeft.settings.setMode("loop", True)
-                    PlayerRight.settings.setMode("loop", True)
-
+                            UpdatePlayBackSpeed()
+                            If Tv_Explorer.Focused = False Then
+                                CurrentTimeList.Focus()
+                            End If
+                            Exit For
+                        End If
+                    Next
+                Else
+                    PlayerCenter.Ctlcontrols.play()
+                    PlayerLeft.Ctlcontrols.play()
+                    PlayerRight.Ctlcontrols.play()
                     UpdatePlayBackSpeed()
-                    If Tv_Explorer.Focused = False Then
-                        CurrentTimeList.Focus()
-                    End If
-                    Exit For
                 End If
-            Next
-
-        End If
-
-    End Sub
-
-    Private Sub TxtBx_Path_TextChanged(sender As Object, e As EventArgs) Handles TxtBx_Path.TextChanged
-        CurrentTimeList.Enabled = False
-        CurrentTimeList.Items.Clear()
-        Dim Location As String = TxtBx_Path.Text
-        If Location.LastIndexOf("\") - Location.Length <> 0 Then
-            Location = Location.Remove(Location.LastIndexOf("\"))
-        End If
-
-        Dim DirInfo As New DirectoryInfo(Location)
-
-        For Each fi As FileInfo In DirInfo.GetFiles.OrderByDescending(Function(p) p.Name).ToArray()
-            If Not (fi.Attributes And FileAttributes.Hidden) = FileAttributes.Hidden Then
-                Dim fiTime As String = fi.Name.Remove(fi.Name.LastIndexOf("-"), fi.Name.Length - fi.Name.LastIndexOf("-"))
-                fiTime = fiTime.Remove(0, fiTime.IndexOf("_") + 1)
-
-                If Not CurrentTimeList.Items.Contains(fiTime.Replace("-", ":")) Then
-                    CurrentTimeList.Items.Add(fiTime.Replace("-", ":"))
-
-                End If
+            Else
+                PlayersPAUSE()
             End If
-        Next
-
+            RenderBTN.Enabled = True
+        Else
+            RenderBTN.Enabled = False
+        End If
+        SelectedNumberOfVideos = CurrentTimeList.SelectedItems.Count
     End Sub
 
     Private Sub ClipSelectUP_Click(sender As Object, e As EventArgs) Handles ClipSelectUP.Click
         If CurrentTimeList.SelectedIndex > 0 Then
-            CurrentTimeList.SelectedIndex -= 1
+            Dim LastIndex As Integer = CurrentTimeList.SelectedIndex
+            CurrentTimeList.SelectedIndices.Clear()
+            CurrentTimeList.SelectedIndex = LastIndex - 1
         End If
     End Sub
 
     Private Sub ClipSelectDOWN_Click(sender As Object, e As EventArgs) Handles ClipSelectDOWN.Click
         If CurrentTimeList.SelectedIndex < CurrentTimeList.Items.Count - 1 Then
-            CurrentTimeList.SelectedIndex += 1
+            Dim LastIndex As Integer = CurrentTimeList.SelectedIndex
+            CurrentTimeList.SelectedIndices.Clear()
+            CurrentTimeList.SelectedIndex = LastIndex + 1
         End If
     End Sub
 
@@ -1220,5 +1371,640 @@ Public Class MainForm
             e.SuppressKeyPress = True
             Return
         End If
+    End Sub
+
+    Private Sub RenderBTN_Click(sender As Object, e As EventArgs) Handles RenderBTN.Click
+        PlayerCenter.Ctlcontrols.pause()
+        PlayerLeft.Ctlcontrols.pause()
+        PlayerRight.Ctlcontrols.pause()
+        PlayerRender.Ctlcontrols.stop()
+        PlayerRender.settings.setMode("loop", True)
+        PlayerRender.URL = ""
+        RenderSaveAsBTN.Enabled = False
+        RenderFileCount = 0
+        RenderFileCountNotDone = 0
+        RenderFileProgress.Text = "---"
+        ThreadsRunningLabel.Text = "---"
+        RenderFirstPlay = False
+        RenderInTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * 0) + 19
+        RenderOutTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * RenderTimeline.Maximum) + 19
+        Dim dir As New IO.DirectoryInfo(Path.GetTempPath() & "TeslaCamViewer")
+        If Not dir.Exists Then
+            FileSystem.MkDir(Path.GetTempPath() & "TeslaCamViewer")
+        End If
+        Try
+            System.IO.File.Delete(Path.GetTempPath() & "TeslaCamViewer\join.txt")
+        Catch ex As Exception
+
+        End Try
+
+        Dim JoinFile As System.IO.StreamWriter
+        JoinFile = My.Computer.FileSystem.OpenTextFileWriter(Path.GetTempPath() & "TeslaCamViewer\join.txt", True, System.Text.Encoding.ASCII)
+
+        If CurrentTimeList.SelectedItem <> Nothing Then
+            Dim di As New IO.DirectoryInfo(FullCenterCameraName.Remove(FullCenterCameraName.LastIndexOf("\")))
+            Dim fis = di.GetFiles().OrderByDescending(Function(p) p.Name).ToArray() '(Function(fi) fi.Name.Contains("front")).ToArray()
+            Dim FilesFound As Boolean = False
+            Dim i As Integer = 0
+            RenderFileCountNotDone = CurrentTimeList.SelectedItems.Count
+            For i = 0 To CurrentTimeList.SelectedItems.Count - 1
+                Dim VideoCenter As String = "-i "
+                Dim VideoLeft As String = "-i "
+                Dim VideoRight As String = "-i "
+                Dim FileGroup As String = ""
+                For Each item In fis
+                    If item.FullName.Remove(0, item.FullName.LastIndexOf("_")).Contains(CurrentTimeList.SelectedItems(i).Replace(":", "-")) Then
+                        FileGroup = item.FullName.Remove(FullCenterCameraName.LastIndexOf("-"))
+                        If Not VideoCenter.Contains(CurrentTimeList.SelectedItems(i)) Then
+                            VideoCenter += Chr(34) & (FileGroup & "-front.mp4") & Chr(34) & " "
+                        End If
+                        If Not VideoLeft.Contains(CurrentTimeList.SelectedItems(i)) Then
+                            If FilpLREnable.Checked = True Then
+                                VideoLeft += Chr(34) & (FileGroup & "-right_repeater.mp4") & Chr(34) & " "
+                            Else
+                                VideoLeft += Chr(34) & (FileGroup & "-left_repeater.mp4") & Chr(34) & " "
+                            End If
+                        End If
+                        If Not VideoRight.Contains(CurrentTimeList.SelectedItems(i)) Then
+                            If FilpLREnable.Checked = True Then
+                                VideoRight += Chr(34) & (FileGroup & "-left_repeater.mp4") & Chr(34) & " "
+                            Else
+                                VideoRight += Chr(34) & (FileGroup & "-right_repeater.mp4") & Chr(34) & " "
+                            End If
+
+                        End If
+                        FilesFound = True
+                        Exit For
+                    End If
+                Next
+                If FilesFound = True Then
+                    Dim FileName As String = Path.GetTempPath() & "TeslaCamViewer\Temp" & CurrentTimeList.SelectedItems.Count - 1 - i & ".mp4"
+                    JoinFile.Write("file Temp" & i & ".mp4" & vbCrLf)
+                    If IsFileInUse(FileName) And File.Exists(FileName) Then
+                        MessageBox.Show("Unable to save video due to file in use" & vbCrLf & FileName, "Error With Selected File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                        Exit Sub
+                    End If
+                    FFmpegOutput.Text = ""
+                    Dim saveas As String = Chr(34) & FileName & Chr(34)
+                    RenderOutputFile = FileName
+                    Dim p As New Process
+                    p.StartInfo.FileName = System.IO.Path.Combine(Application.StartupPath, "ffmpeg.exe")
+                    p.StartInfo.UseShellExecute = False
+                    p.StartInfo.CreateNoWindow = True
+                    p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                    p.StartInfo.RedirectStandardError = True
+                    p.EnableRaisingEvents = True
+                    Application.DoEvents()
+
+                    AddHandler p.ErrorDataReceived, AddressOf proccess_OutputDataReceived
+                    AddHandler p.OutputDataReceived, AddressOf proccess_OutputDataReceived
+                    AddHandler p.Exited, AddressOf proc_Exited
+                    Dim FileTime As String = FileGroup.Remove(0, FileGroup.LastIndexOf("\") + 1).Replace("_", "  ").Replace("-", ".")
+                    Dim Watermark As String = " drawtext=text='" & FileTime & "                 TeslaCam Viewer - Ver." & CurrentVersion & "':x=(5):y=(5):fontfile='/Windows/Fonts/AGENCYR.TTF':fontsize=40:fontcolor=white,"
+
+                    '.gif file
+                    'p.StartInfo.Arguments = VideoLeft & VideoCenter & VideoRight & "-filter_complex " & Chr(34) & "[1:v][0:v]scale2ref=oh*mdar:ih[1v][0v];[2:v][0v]scale2ref=oh*mdar:ih[2v][0v];[0v][1v][2v]hstack=3,scale='2*trunc(iw/2)':'2*trunc(ih/2)'" & Chr(34) & " -y -r 20 " & saveas
+                    Dim SelectedQuality = 0
+                    Dim Mirror As String = ""
+                    If MirrorLREnable.Checked = True Then
+                        Mirror = " hflip,"
+                    End If
+                    Select Case RenderQuality.SelectedIndex
+                        Case 0
+                            SelectedQuality = 1
+                        Case 1
+                            SelectedQuality = 2
+                        Case 2
+                            SelectedQuality = 4
+                        Case 3
+                            SelectedQuality = 8
+                    End Select
+                    My.Settings.RenderQuality = RenderQuality.SelectedIndex
+
+                    If RadioButton1.Checked = True Then
+                        'Center large - Left
+                        'Left & right - Stack right
+                        My.Settings.RenderSelection = 0
+                        p.StartInfo.Arguments = VideoCenter & VideoLeft & VideoRight & "-filter_complex " & Chr(34) & "color=s=" & 1920 / SelectedQuality & "x" & 960 / SelectedQuality & ":c=black [base];[0:v]" & Watermark & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [center];[1:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 640 / SelectedQuality & "x" & 480 / SelectedQuality & " [topright];[2:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 640 / SelectedQuality & "x" & 480 / SelectedQuality & " [bottomright];[base][center] overlay=shortest=1 [tmp1];[tmp1][topright] overlay=shortest=0:x=" & 1280 / SelectedQuality & " [tmp2];[tmp2][bottomright] overlay=shortest=0:x=" & 1280 / SelectedQuality & ":y=" & 480 / SelectedQuality & Chr(34) & " -y -preset veryfast " & saveas
+
+                    ElseIf RadioButton2.Checked = True Then
+                        'center - top
+                        'Left/right - bottom
+                        My.Settings.RenderSelection = 1
+                        p.StartInfo.Arguments = VideoCenter & VideoLeft & VideoRight & "-filter_complex " & Chr(34) & "color=s=" & 2560 / SelectedQuality & "x" & 1920 / SelectedQuality & ":c=black [base];[0:v]" & Watermark & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [center];[1:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [bottomleft];[2:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [bottomright];[base][center] overlay=shortest=1:x=" & 640 / SelectedQuality & " [tmp1];[tmp1][bottomleft] overlay=shortest=0:y=" & 960 / SelectedQuality & " [tmp2];[tmp2][bottomright] overlay=shortest=0:x=" & 1280 / SelectedQuality & ":y=" & 960 / SelectedQuality & Chr(34) & " -y -preset veryfast " & saveas
+                    ElseIf RadioButton3.Checked = True Then
+                        '3 wide - 
+                        My.Settings.RenderSelection = 2
+                        p.StartInfo.Arguments = VideoLeft & VideoCenter & VideoRight & "-filter_complex " & Chr(34) & "color=s=" & 3840 / SelectedQuality & "x" & 1920 / SelectedQuality & ":c=black [base];[0:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [center];[1:v]" & Watermark & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [bottomleft];[2:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [bottomright];[base][center] overlay=shortest=1:y=" & 480 / SelectedQuality & " [tmp1];[tmp1][bottomleft] overlay=shortest=0:y=" & 480 / SelectedQuality & ":x=" & 1280 / SelectedQuality & " [tmp2];[tmp2][bottomright] overlay=shortest=0:y=" & 480 / SelectedQuality & ":x=" & 2560 / SelectedQuality & Chr(34) & " -y -preset veryfast " & saveas
+
+                    ElseIf RadioButton4.Checked = True Then
+                        'Left & Center   
+                        My.Settings.RenderSelection = 3
+                        p.StartInfo.Arguments = VideoLeft & VideoCenter & "-filter_complex " & Chr(34) & "color=s=" & 2560 / SelectedQuality & "x" & 960 / SelectedQuality & ":c=black [base];[0:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [right];[1:v]" & Watermark & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [left];[base][right] overlay=shortest=1 [tmp1];[tmp1][left] overlay=shortest=0:x=" & 1280 / SelectedQuality & Chr(34) & " -y -preset veryfast " & saveas
+                    ElseIf RadioButton5.Checked = True Then
+                        'Center & Right 
+                        My.Settings.RenderSelection = 4
+                        p.StartInfo.Arguments = VideoCenter & VideoRight & "-filter_complex " & Chr(34) & "color=s=" & 2560 / SelectedQuality & "x" & 960 / SelectedQuality & ":c=black [base];[0:v]" & Watermark & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [right];[1:v]" & Mirror & " setpts=PTS-STARTPTS, scale=" & 1280 / SelectedQuality & "x" & 960 / SelectedQuality & " [left];[base][right] overlay=shortest=0 [tmp1];[tmp1][left] overlay=shortest=1:x=" & 1280 / SelectedQuality & Chr(34) & " -y -preset veryfast " & saveas
+                    End If
+                    My.Settings.FlipLR = FilpLREnable.Checked
+                    My.Settings.MirrorLR = MirrorLREnable.Checked
+
+                    DurationProgressBar.Style = ProgressBarStyle.Marquee
+                    DurationProgressBar.Maximum = 1
+                    DurationProgressBar.Value = 0
+
+                    GroupBoxRENDER.Visible = True
+                    GroupBoxRENDER.BringToFront()
+                    VideoRendering.Visible = True
+
+                    GroupBoxCONTROLS.Enabled = False
+                    GroupBoxEXPLORER.Enabled = False
+                    GroupBoxFRONT.Enabled = False
+                    GroupBoxLEFTREPEATER.Enabled = False
+                    GroupBoxRIGHTREPEATER.Enabled = False
+
+                    UpdateTextBox("---- Starting FFmpeg ----")
+                    UpdateTextBox(" ")
+                    UpdateTextBox("ffmpeg " & p.StartInfo.Arguments)
+                    UpdateTextBox(" ")
+                    Try
+                        RenderFileCount += 1
+                        Call p.Start()
+                    Catch ex As Exception
+                        UpdateTextBox("---- ERROR Starting FFmpeg ----")
+                    End Try
+                    Try
+                        p.BeginErrorReadLine()
+                    Catch ex As Exception
+
+                    End Try
+                End If
+            Next i
+        Else
+            RenderBTN.Enabled = False
+        End If
+        JoinFile.Close()
+    End Sub
+
+    Public Sub UpdateTextBox(text As String)
+        If text.IsNormalized Then
+            FFmpegOutput.Text += Environment.NewLine & text.ToString
+        End If
+        FFmpegOutput.SelectionStart = FFmpegOutput.Text.Length
+        FFmpegOutput.ScrollToCaret()
+        If text.Contains("Duration:") Then
+            Try
+                Dim MaxDuration As Integer = text.Remove(text.IndexOf(","), text.Length - text.IndexOf(",")).Remove(0, text.IndexOf(":")).Replace(":", "").Replace(".", "")
+                DurationProgressBar.Style = ProgressBarStyle.Continuous
+                If MaxDuration > DurationProgressBar.Maximum Then
+                    If MaxDuration < 6000 Then
+                        DurationProgressBar.Maximum = MaxDuration
+                    Else
+                        DurationProgressBar.Maximum = 6000
+                    End If
+                End If
+            Catch ex As Exception
+            End Try
+        End If
+        If text.Contains("time=0") Then
+            Try
+                Dim CurrentTime As Integer = text.Remove(text.IndexOf(" bitrate="), text.Length - text.IndexOf(" bitrate=")).Remove(0, text.IndexOf("time=0") + 6).Replace(":", "").Replace(".", "")
+                DurationProgressBar.Style = ProgressBarStyle.Continuous
+                DurationProgressBar.Value = CurrentTime
+                If RenderFileCount = 0 And RenderFileCountNotDone = 0 Then
+                    RenderFileProgress.Text = "DONE"
+                    ThreadsRunningLabel.Text = "DONE"
+                    DurationProgressBar.Value = DurationProgressBar.Maximum
+                Else
+                    RenderFileProgress.Text = RenderFileCount & " of " & RenderFileCountNotDone
+                End If
+                ThreadsRunningLabel.Text = RenderFileCount & " Running"
+            Catch ex As Exception
+
+            End Try
+        End If
+    End Sub
+
+    Public Sub proccess_OutputDataReceived(ByVal sender As Object, ByVal e As DataReceivedEventArgs)
+        If Not String.IsNullOrEmpty(e.Data) Then
+            If Me.InvokeRequired = True Then
+                Try
+                    Me.Invoke(myDelegate, e.Data)
+                Catch ex As Exception
+
+                End Try
+            Else
+                Try
+                    UpdateTextBox(e.Data)
+                Catch ex As Exception
+
+                End Try
+            End If
+        End If
+    End Sub
+    Dim RenderedVideoReady As Boolean = False
+    Private Sub proc_Exited(ByVal sender As Object, ByVal e As System.EventArgs) ' Handles p.Exited
+        If Me.InvokeRequired = True Then
+            Me.Invoke(myDelegate, "---- Finished converting video ----")
+        Else
+            UpdateTextBox("---- Finished converting video ----")
+        End If
+
+        DurationProgressBar.Value = DurationProgressBar.Maximum
+        RenderedVideoReady = False
+        RenderFileCount -= 1
+        RenderFileCountNotDone -= 1
+        If RenderFileCount = 0 And RenderFileCountNotDone = 0 Then
+            If Me.InvokeRequired = True Then
+                Me.Invoke(myDelegate, "---- All files are done converting ----")
+                RenderSaveAsBTN.Enabled = True
+            Else
+                UpdateTextBox("---- All files are done converting ----")
+                RenderSaveAsBTN.Enabled = True
+            End If
+            DurationProgressBar.Style = ProgressBarStyle.Continuous
+            If SelectedNumberOfVideos = 1 Or RenderOutputFile = Path.GetTempPath() & "TeslaCamViewer\Temp.mp4" Then
+                Try
+                    RenderedVideoReady = False
+                    PlayerRender.URL = RenderOutputFile
+                    PlayerRender.Ctlcontrols.play()
+                    VideoRendering.Visible = False
+                Catch ex As Exception
+                    'MessageBox.Show("Error loading render media" & vbCrLf & e.ToString, "Error With Selected File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                End Try
+            Else
+                If Me.InvokeRequired = True Then
+                    Me.Invoke(myDelegate, "---- Rendering all clips together now ----")
+                Else
+                    UpdateTextBox("---- Rendering all clips together now ----")
+                End If
+                Dim VideoALL As String = "-f concat -safe 0 -i " & Chr(34) & Path.GetTempPath().Replace("\", "/") & "TeslaCamViewer/join.txt" & Chr(34)
+                VideoALL += " -c copy -y -preset veryfast " & Chr(34) & Path.GetTempPath() & "TeslaCamViewer\Temp.mp4" & Chr(34)
+
+                Dim p As New Process
+                p.StartInfo.FileName = System.IO.Path.Combine(Application.StartupPath, "ffmpeg.exe")
+                p.StartInfo.UseShellExecute = False
+                p.StartInfo.CreateNoWindow = True
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                p.StartInfo.RedirectStandardError = True
+                p.EnableRaisingEvents = True
+                Application.DoEvents()
+
+                AddHandler p.ErrorDataReceived, AddressOf proccess_OutputDataReceived
+                AddHandler p.OutputDataReceived, AddressOf proccess_OutputDataReceived
+                AddHandler p.Exited, AddressOf proc_Exited
+
+                p.StartInfo.Arguments = VideoALL
+                DurationProgressBar.Maximum = 1
+                DurationProgressBar.Value = 0
+                GroupBoxRENDER.BringToFront()
+                VideoRendering.Visible = True
+                FFmpegOutput.Text += "---- Starting FFmpeg ----" & Environment.NewLine
+                UpdateTextBox(" ")
+                UpdateTextBox("ffmpeg " & p.StartInfo.Arguments)
+                UpdateTextBox(" ")
+                Try
+                    Call p.Start()
+                    RenderFileCount = 1
+                    RenderFileCountNotDone = 1
+                    RenderOutputFile = Path.GetTempPath() & "TeslaCamViewer\Temp.mp4"
+                Catch ex As Exception
+                    FFmpegOutput.Text += "---- ERROR Starting FFmpeg ----" & Environment.NewLine
+                End Try
+
+                Try
+                    p.BeginErrorReadLine()
+                Catch ex As Exception
+
+                End Try
+            End If
+        Else
+            If Me.InvokeRequired = True Then
+                Me.Invoke(myDelegate, "---- Waiting for " & RenderFileCount & " file(s) to finish converting ----")
+            Else
+                UpdateTextBox("---- Waiting for " & RenderFileCount & " file(s) to finish converting ----")
+            End If
+        End If
+        If RenderFileCount = 0 And RenderFileCountNotDone = 0 Then
+            RenderFileProgress.Text = "DONE"
+            ThreadsRunningLabel.Text = "DONE"
+        Else
+            RenderFileProgress.Text = RenderFileCount & " of " & RenderFileCountNotDone
+            ThreadsRunningLabel.Text = RenderFileCount & " Running"
+        End If
+
+    End Sub
+
+    Public Function IsFileInUse(sFile As String) As Boolean
+        Try
+            Using f As New IO.FileStream(sFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
+            End Using
+        Catch Ex As Exception
+            Return True
+        End Try
+        Return False
+    End Function
+    Private Sub CloseGroupboxRender_Click(sender As Object, e As EventArgs) Handles CloseGroupboxRender.Click
+        GroupBoxCONTROLS.Enabled = True
+        GroupBoxEXPLORER.Enabled = True
+        GroupBoxFRONT.Enabled = True
+        GroupBoxLEFTREPEATER.Enabled = True
+        GroupBoxRIGHTREPEATER.Enabled = True
+
+        GroupBoxRENDER.Visible = False
+        PlayerRender.Ctlcontrols.stop()
+        PlayerRender.URL = ""
+        RenderedVideoReady = False
+        RenderOutputFile = ""
+        GroupBoxSettings.Visible = False
+        Try
+            Dim a As Integer = 0
+            For Each PRunning As Process In System.Diagnostics.Process.GetProcessesByName("ffmpeg")
+                PRunning.Kill()
+                a += 1
+            Next
+            'MessageBox.Show("Killed " & a & " Processes ", "Kill Process", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Catch ex As Exception
+
+        End Try
+        Try
+            Dim a As String = Path.GetTempPath() & "TeslaCamViewer\"
+            System.IO.Directory.Delete(Path.GetTempPath() & "TeslaCamViewer\", True)
+        Catch ex As Exception
+            'MessageBox.Show("Unable to delete temp folder: " & vbCrLf & ex.Message, "Error ", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+
+
+
+    End Sub
+
+    Private Sub PlayerRender_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles PlayerRender.PlayStateChange
+        If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPlaying Then
+            RenderTimeline.Maximum = (PlayerRender.currentMedia.duration * 10)
+            If RenderFirstPlay = False Then
+                RenderFirstPlay = True
+                RenderOutTime = RenderTimeline.Maximum
+                RenderInTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * 0) + 19
+                RenderOutTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * RenderTimeline.Maximum) + 19
+
+                RenderTimeline.Value = 0
+                RenderInTime = 0
+            End If
+            If RenderedVideoReady = False Then
+                RenderedVideoReady = True
+            End If
+        End If
+    End Sub
+
+    Private Sub SettingsBTN_Click(sender As Object, e As EventArgs) Handles SettingsBTN.Click
+        GroupBoxSettings.Size = GroupBoxControlsWindow.Size
+        GroupBoxSettings.Location = GroupBoxControlsWindow.Location
+        GroupBoxSettings.Visible = True
+        PlayersPAUSE()
+    End Sub
+
+    Private Sub CloseGroupboxSettings_Click(sender As Object, e As EventArgs) Handles CloseGroupboxSettings.Click
+        GroupBoxSettings.Visible = False
+    End Sub
+
+    Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton1.CheckedChanged
+        If RadioButton1.Checked = True Then
+            RadioButton2.Checked = False
+            RadioButton3.Checked = False
+            RadioButton4.Checked = False
+            RadioButton5.Checked = False
+        End If
+    End Sub
+
+    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton2.CheckedChanged
+        If RadioButton2.Checked = True Then
+            RadioButton1.Checked = False
+            RadioButton3.Checked = False
+            RadioButton4.Checked = False
+            RadioButton5.Checked = False
+        End If
+    End Sub
+
+    Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton3.CheckedChanged
+        If RadioButton3.Checked = True Then
+            RadioButton1.Checked = False
+            RadioButton2.Checked = False
+            RadioButton4.Checked = False
+            RadioButton5.Checked = False
+        End If
+    End Sub
+
+    Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton4.CheckedChanged
+        If RadioButton4.Checked = True Then
+            RadioButton1.Checked = False
+            RadioButton2.Checked = False
+            RadioButton3.Checked = False
+            RadioButton5.Checked = False
+        End If
+    End Sub
+
+    Private Sub RadioButton5_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton5.CheckedChanged
+        If RadioButton5.Checked = True Then
+            RadioButton1.Checked = False
+            RadioButton2.Checked = False
+            RadioButton3.Checked = False
+            RadioButton4.Checked = False
+        End If
+    End Sub
+
+    Private Sub RenderSaveAsBTN_Click(sender As Object, e As EventArgs) Handles RenderSaveAsBTN.Click
+        Dim sfd As New SaveFileDialog
+        sfd.Title = "Save Video As..."
+        sfd.FileName = "Untitled"
+        sfd.DefaultExt = ".mp4"
+        sfd.AddExtension = True
+        sfd.Filter = "MP4 Files (*.mp4*)|*.mp4|AVI Image (.avi)|*.avi|Gif Image (.gif)|*.gif"
+        If sfd.ShowDialog = Windows.Forms.DialogResult.OK Then
+            PlayerRender.Ctlcontrols.stop()
+            PlayerRender.URL = ""
+            Dim p As New Process
+
+            p.StartInfo.FileName = System.IO.Path.Combine(Application.StartupPath, "ffmpeg.exe")
+            p.StartInfo.UseShellExecute = False
+            p.StartInfo.CreateNoWindow = True 'False 'True
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden  'Hidden
+            p.StartInfo.RedirectStandardError = True
+            p.EnableRaisingEvents = True
+            Application.DoEvents()
+
+            AddHandler p.ErrorDataReceived, AddressOf proccess_OutputDataReceived
+            AddHandler p.OutputDataReceived, AddressOf proccess_OutputDataReceived
+            AddHandler p.Exited, AddressOf proc_Exited
+            Dim StartMin As Integer = 0
+            Dim StartSec As Double = 0
+            Dim EndMin As Integer = 0
+            Dim EndSec As Double = 0
+            If RenderInTime > 599 Then
+                Dim TempTime As Integer = RenderInTime
+                For i = 1 To RenderInTime / 600
+                    StartMin += 1
+                    TempTime -= 600
+                Next
+                StartSec = TempTime / 10
+            Else
+                StartSec = RenderInTime / 10
+            End If
+            If RenderOutTime > 599 Then
+                Dim TempTime As Integer = RenderOutTime
+                For i = 1 To RenderOutTime / 600
+                    EndMin += 1
+                    TempTime -= 600
+                Next
+                EndSec = TempTime / 10
+            Else
+                EndSec = RenderOutTime / 10
+            End If
+            EndMin -= StartMin
+            EndSec -= StartSec
+            If EndSec < 0 Then
+                EndMin -= 1
+                EndSec = Math.Abs(EndSec)
+            End If
+
+            p.StartInfo.Arguments = "-ss 00:" & StartMin.ToString("00") & ":" & StartSec.ToString("00.00") & " -i " & Chr(34) & RenderOutputFile & Chr(34) & " -t 00:" & EndMin.ToString("00") & ":" & EndSec.ToString("00.00") & " -y -preset veryfast " & Chr(34) & sfd.FileName & Chr(34)
+            Try
+                Call p.Start()
+                RenderFileCount = 1
+                RenderFileCountNotDone = 1
+            Catch ex As Exception
+                UpdateTextBox("---- ERROR Starting FFmpeg ----")
+            End Try
+
+            Try
+                p.BeginErrorReadLine()
+            Catch ex As Exception
+
+            End Try
+        End If
+    End Sub
+
+    Private Sub RenderTimeline_MouseEnter(sender As Object, e As EventArgs) Handles RenderTimeline.MouseEnter
+        'PlayerRender.CreateControl()
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+
+    Private Sub RenderTimeline_MouseLeave(sender As Object, e As EventArgs) Handles RenderTimeline.MouseLeave
+        If VideoRendering.Visible = False Then
+            ' PlayerRender.Ctlcontrols.play()
+        End If
+    End Sub
+
+    Private Sub RenderTimeline_ValueChanged(sender As Object, e As EventArgs) Handles RenderTimeline.ValueChanged
+        PlayerRender.CreateControl()
+        If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPaused And RenderTimeline.Value >= (RenderVideoLastPos - 10) * 10 And RenderTimeline.Value <= (RenderVideoLastPos + 10) * 10 Then
+            PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            RenderVideoLastPos = PlayerRender.Ctlcontrols.currentPosition
+            PlayerRender.Ctlcontrols.play()
+            PlayerRender.Ctlcontrols.pause()
+        End If
+        If PlayerRender.playState = WMPLib.WMPPlayState.wmppsPlaying Then
+            RenderVideoLastPos = PlayerRender.Ctlcontrols.currentPosition
+            If RenderTimeline.Value >= RenderOutTime Then
+                RenderTimeline.Value = RenderInTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+            If RenderTimeline.Value < RenderInTime Then
+                RenderTimeline.Value = RenderInTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+        End If
+    End Sub
+
+    Private Sub RenderSaveOptions_MouseEnter(sender As Object, e As EventArgs) Handles RenderSaveOptions.MouseEnter
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+
+    Private Sub RenderSaveAsBTN_MouseEnter(sender As Object, e As EventArgs) Handles RenderSaveAsBTN.MouseEnter
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+
+    Private Sub FFmpegOutput_MouseEnter(sender As Object, e As EventArgs) Handles FFmpegOutput.MouseEnter
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+
+    Private Sub RenderInTimeLabel_MouseEnter(sender As Object, e As EventArgs) Handles RenderInTimeLabel.MouseEnter
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+
+    Private Sub RenderOutTimeLabel_MouseEnter(sender As Object, e As EventArgs) Handles RenderOutTimeLabel.MouseEnter
+        PlayerRender.Ctlcontrols.pause()
+    End Sub
+    Private Sub GroupBoxRENDER_MouseEnter(sender As Object, e As EventArgs) Handles GroupBoxRENDER.MouseEnter
+        If VideoRendering.Visible = False Then
+            PlayerRender.Ctlcontrols.play()
+        End If
+    End Sub
+
+    Private Sub RenderInTimeLabel_MouseClick(sender As Object, e As MouseEventArgs) Handles RenderInTimeLabel.MouseClick
+        If e.Button = MouseButtons.Right Then
+            RenderInTime = RenderTimeline.Value
+            If RenderTimeline.Value >= RenderOutTime Then
+                RenderTimeline.Value = RenderInTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+            If RenderTimeline.Value < RenderInTime Then
+                RenderTimeline.Value = RenderInTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+            RenderInTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * RenderTimeline.Value) + 19
+        End If
+    End Sub
+
+    Private Sub RenderOutTimeLabel_MouseClick(sender As Object, e As MouseEventArgs) Handles RenderOutTimeLabel.MouseClick
+        If e.Button = MouseButtons.Right Then
+            RenderOutTime = RenderTimeline.Value
+            If RenderTimeline.Value > RenderOutTime Then
+                RenderTimeline.Value = RenderOutTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+            If RenderTimeline.Value < RenderInTime Then
+                RenderTimeline.Value = RenderInTime
+                PlayerRender.Ctlcontrols.currentPosition = RenderTimeline.Value / 10
+            End If
+            RenderOutTimeGraphic.Left = (((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum) * RenderTimeline.Value) + 19
+        End If
+    End Sub
+
+    Private Sub RenderInTimeGraphic_Click(sender As Object, e As EventArgs) Handles RenderInTimeGraphic.Click
+        If MoveRenderIn = True Then
+            MoveRenderIn = False
+        Else
+            MoveRenderIn = True
+        End If
+    End Sub
+
+    Private Sub RenderOutTimeGraphic_Click(sender As Object, e As EventArgs) Handles RenderOutTimeGraphic.Click
+        If MoveRenderOut = True Then
+            MoveRenderOut = False
+        Else
+            MoveRenderOut = True
+        End If
+    End Sub
+
+    Private Sub RenderTimeline_MouseMove(sender As Object, e As MouseEventArgs) Handles RenderTimeline.MouseMove
+        If MoveRenderOut = True And e.X < GroupBoxRENDER.Width - 42 And e.X > 9 Then
+            RenderOutTimeGraphic.Left = e.X + 10
+            RenderOutTime = (e.X / ((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum)) '* 10
+        End If
+        If MoveRenderIn = True And e.X < GroupBoxRENDER.Width - 42 And e.X > 9 Then
+            RenderInTimeGraphic.Left = e.X + 10
+            RenderInTime = (e.X / ((GroupBoxRENDER.Width - 29 - 22) / RenderTimeline.Maximum)) '* 10
+        End If
+
+    End Sub
+
+    Private Sub PlayerRender_MouseMoveEvent(sender As Object, e As _WMPOCXEvents_MouseMoveEvent) Handles PlayerRender.MouseMoveEvent
+        If PlayerRender.playState <> WMPLib.WMPPlayState.wmppsPlaying And VideoRendering.Visible = False Then
+            PlayerRender.Ctlcontrols.play()
+        End If
+    End Sub
+
+    Private Sub RenderQuality_SelectedIndexChanged(sender As Object, e As EventArgs) Handles RenderQuality.SelectedIndexChanged
+
     End Sub
 End Class
