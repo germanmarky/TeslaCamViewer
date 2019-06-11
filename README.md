@@ -24,7 +24,7 @@ Version 2019.21.1.0
                     
 [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.21.1.0.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
-[YouTube Demo](https://youtu.be/DXO11PsjMOY)
+[YouTube Demo](https://youtu.be/dri6_cSDTkA)
 
 Features
 --------
