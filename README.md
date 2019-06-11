@@ -2,7 +2,7 @@
 A file viewer for TeslaCam
 
 
-[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/DXO11PsjMOY)
+[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/dri6_cSDTkA)
 
 Install
 ======================================
