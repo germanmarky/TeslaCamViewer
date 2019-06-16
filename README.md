@@ -41,7 +41,7 @@ Features
 
           (Settings saved under: %homepath%\AppData\Local\Nate_Mccomb or Search: TeslaCam Viewer.exe.config)
 * Hold shift key while executing application to reset all settings.
-* Join and Export clips in to one file
+* Join and Export clips in to one file, Save As .mp4 .avi or .gif
 * Choose from 5+ view layouts for exporting
 * Flip and/or mirror option for side cameras durring export
 * Trim video clips before saving file
