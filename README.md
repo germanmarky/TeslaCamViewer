@@ -8,6 +8,10 @@ Install
 ======================================
 I have included a precompiled version in the Binary folder for easy install.
 
+If you have the Tesla FSD Computer(HW3) installed and/or get black videos, then you'll need to install the H.265 codec. 
+
+* [Microsoft H.265 codec (HEVC Video Extensions)](https://www.microsoft.com/en-us/p/hevc-video-extensions-from-device-manufacturer/9n4wgh0z6vhq?irgwc=1&OCID=AID681541_aff_7593_159229&tduid=%28ir_wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0%29%287593%29%28159229%29%28%29%28UUwpUdUnU56397YYwYd%29&irclickid=wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0&activetab=pivot%3Aoverviewtab)
+
 
 Version 2019.25.1.0 - With Video Editor/Export Options
 ======================================
