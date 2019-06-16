@@ -1,12 +1,15 @@
-2019.24.1.0
+2019.25.1.0
 Updates
 -------------
-Added "Export" for selected clips 24.1
-Added 5 view layouts to pick from when exporting 24.1
-Added "trim" function for exported clips 24.1
-Added Settings Reset(Hold SHIFT while launching) 21.1
+Updated UI - 25.1
+Updated Explorer to search to any folder - 25.1
+Added Timecode overlay to exported video clips - 25.1
+Added "Export" for selected clips - 24.1
+Added 5 view layouts to pick from when exporting - 24.1
+Added "trim" function for exported clips - 24.1
+Added Settings Reset(Hold SHIFT while launching) - 21.1
 Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
-Fixed major bug when selecting folders to view Sentry Mode triggered events - 21.1
+Fixed minor bug throughout viewer and export functions - 25.1
