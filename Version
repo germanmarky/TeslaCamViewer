@@ -1,4 +1,4 @@
-2019.25.3.1
+2019.25.3.2
 Updates
 -------------
 Added Single camera option for exporting - 25.3
@@ -16,4 +16,5 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
+Fixed minor bug if other files are mixed in with TeslaCam videos - 25.3.2
 Fixed minor bug throughout viewer and export functions - 25.1
