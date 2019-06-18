@@ -13,11 +13,11 @@ If you have the Tesla FSD Computer(HW3) installed and/or get black videos, then 
 * [Microsoft H.265 codec (HEVC Video Extensions)](https://www.microsoft.com/en-us/p/hevc-video-extensions-from-device-manufacturer/9n4wgh0z6vhq?irgwc=1&OCID=AID681541_aff_7593_159229&tduid=%28ir_wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0%29%287593%29%28159229%29%28%29%28UUwpUdUnU56397YYwYd%29&irclickid=wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0&activetab=pivot%3Aoverviewtab)
 
 
-Version 2019.25.3.0 - With Video Editor/Export Options
+Version 2019.25.3.1 - With Video Editor/Export Options
 ======================================
-[Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.25.3.0.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
+[Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.25.3.1.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
                     
-[Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.25.3.0.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
+[Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.25.3.1.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
 * Larger install files due to including FFmpeg for video editing
 * Remove FFmpeg.exe to disable export functions
