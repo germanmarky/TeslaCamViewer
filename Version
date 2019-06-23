@@ -1,6 +1,8 @@
-2019.25.3.2
+2019.26.0.0
 Updates
 -------------
+Added the ability to right click 'Explorer' to Copy, Paste and Delete files or folders - 26.0
+Fixed one click on video player for full screen - 26.0
 Added Single camera option for exporting - 25.3
 Added Adjust playback speed of exported video - 25.2
 Added Drag & Drop files/folders to add them to the Explorer window - 25.2
@@ -12,9 +14,13 @@ Added "Export" for selected clips - 24.1
 Added 5 view layouts to pick from when exporting - 24.1
 Added "trim" function for exported clips - 24.1
 Added Settings Reset(Hold SHIFT while launching) - 21.1
+
 Still FREE! - Please Donate!
+
 …………………………………………………………….
 Bug Fixes 
 -------------
+Fixed issue with non TeslaCam files mixed in folders - 26.0
+Fixed settings not transferring when installing a new version of TeslaCam - 26.0
 Fixed minor bug if other files are mixed in with TeslaCam videos - 25.3.2
 Fixed minor bug throughout viewer and export functions - 25.1
