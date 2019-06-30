@@ -1,4 +1,4 @@
-2019.26.0.0
+2019.26.6.0
 Updates
 -------------
 Added the ability to right click 'Explorer' to Copy, Paste and Delete files or folders - 26.0
@@ -20,6 +20,7 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
+Fixed issues with rendering FPS and minor bugs - 26.6
 Fixed issue with non TeslaCam files mixed in folders - 26.0
 Fixed settings not transferring when installing a new version of TeslaCam - 26.0
 Fixed minor bug if other files are mixed in with TeslaCam videos - 25.3.2
