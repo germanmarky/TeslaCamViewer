@@ -19,6 +19,8 @@ Version 2019.27.4.1 - With Video Editor/Export Options
                     
 [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.27.4.1.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
+[YouTube Demo](https://youtu.be/dri6_cSDTkA)
+
 * Larger install files due to including FFmpeg for video editing
 * Remove FFmpeg.exe to disable export functions
 
@@ -29,7 +31,7 @@ Version 2019.21.4.1
                     
 [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.21.1.0.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
-[YouTube Demo](https://youtu.be/dri6_cSDTkA)
+
 
 Features
 --------
