@@ -1,7 +1,8 @@
-2019.27.2.0
+2019.27.4.1
 Updates
 -------------
-Fixed 36.00 FPS to match original TeslaCam videos when rendering videos 27.2
+Added error/bug reporting - 27.4.1
+Fixed 36.00 FPS to match original TeslaCam videos when rendering videos - 27.2
 Added the ability to right click 'Explorer' to Copy, Paste and Delete files or folders - 26.0
 Fixed one click on video player for full screen - 26.0
 Added Single camera option for exporting - 25.3
@@ -21,6 +22,7 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
+Minor bug fixes - 27.4.1
 Fixed issues with rendering FPS and minor bugs - 26.6
 Fixed issue with non TeslaCam files mixed in folders - 26.0
 Fixed settings not transferring when installing a new version of TeslaCam - 26.0
