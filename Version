@@ -1,6 +1,7 @@
-2019.27.4.1
+2019.27.6.1
 Updates
 -------------
+Fixed playback speed issues when switching to next file - 27.6.1
 Added error/bug reporting - 27.4.1
 Fixed 36.00 FPS to match original TeslaCam videos when rendering videos - 27.2
 Added the ability to right click 'Explorer' to Copy, Paste and Delete files or folders - 26.0
@@ -22,6 +23,7 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
+Some languages use a comma(,) instead of a decimal point(.) causing Save As files to fail when rendering - 27.6.1
 Minor bug fixes - 27.4.1
 Fixed issues with rendering FPS and minor bugs - 26.6
 Fixed issue with non TeslaCam files mixed in folders - 26.0
