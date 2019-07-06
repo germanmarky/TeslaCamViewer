@@ -1,4 +1,4 @@
-2019.27.6.2
+2019.27.6.3
 Updates
 -------------
 Added error/bug reporting - 27.4.1
@@ -22,7 +22,7 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
-Fixed playback speed when saving videos - 27.6.2
+Fixed playback speed when saving videos - 27.6.3
 Fixed playback speed issues when switching to next file - 27.6.1
 Some languages use a comma(,) instead of a decimal point(.) causing Save As files to fail when rendering - 27.6.1
 Minor bug fixes - 27.4.1
