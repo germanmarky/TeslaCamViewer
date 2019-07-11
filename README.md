@@ -13,12 +13,11 @@ I have included a precompiled version in the Binary folder for easy install.
 
 ## [Report bugs or other issues by clicking here](https://docs.google.com/forms/d/e/1FAIpQLSdJ0CJAGLvgEIewbt9OHaU_JiJTP_AmIiecpvHEiHlWe4ZHcQ/viewform)
 
-### Help support Nate in making future improvements though PayPal
-
-[![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
+### Help support Nate in making future improvements though PayPal [![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
 Version 2019.28.3.0 - With Video Editor/Export Options
 ======================================
+#### .NET Framework 3.5 must be installed
 [Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.28.3.0.zip) Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
                     
 [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.28.3.0.zip) Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
@@ -47,7 +46,7 @@ Features
           (Settings saved under: %homepath%\AppData\Local\Nate_Mccomb or Search: TeslaCam Viewer.exe.config)
 * Hold shift key while executing application to reset all settings.
 * Join and Export clips in to one file, Save As .mp4 .avi or .gif
-* Choose from 5+ view layouts for exporting
+* Choose from 5+ view layouts for exporting  
 * Flip and/or mirror option for side cameras durring export
 * Trim video clips before saving file
 * Drag & Drop files/folders to add them to the Explorer tree
