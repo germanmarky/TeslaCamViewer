@@ -11,7 +11,7 @@ I have included a precompiled version in the Binary folder for easy install.
 
 * [Microsoft H.265 codec (HEVC Video Extensions)](https://www.microsoft.com/en-us/p/hevc-video-extensions-from-device-manufacturer/9n4wgh0z6vhq?irgwc=1&OCID=AID681541_aff_7593_159229&tduid=%28ir_wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0%29%287593%29%28159229%29%28%29%28UUwpUdUnU56397YYwYd%29&irclickid=wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0&activetab=pivot%3Aoverviewtab)
 
-## [Report bugs or other issues by clicking here](https://docs.google.com/forms/d/e/1FAIpQLSdJ0CJAGLvgEIewbt9OHaU_JiJTP_AmIiecpvHEiHlWe4ZHcQ/viewform)
+## [Report bugs or other issues here](https://docs.google.com/forms/d/e/1FAIpQLSdJ0CJAGLvgEIewbt9OHaU_JiJTP_AmIiecpvHEiHlWe4ZHcQ/viewform)
 
 ### Help support Nate in making future improvements though PayPal [![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
@@ -29,6 +29,8 @@ Version 2019.28.3.0 - With Video Editor/Export Options
 * Multi-Language Support 
 
 ![Multi-Language](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCam%20Viewer%20Language%20Selection.png)
+
+## [Feature request or give user feedback here](https://docs.google.com/forms/d/e/1FAIpQLScl0Eg_RRAbHcJf2tBZ42SrP5RkOWo1xrL4O763WsmPCgqXWA/viewform)
 
 
 Features
