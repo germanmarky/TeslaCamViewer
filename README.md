@@ -1,7 +1,6 @@
 # TeslaCamViewer  
 A file viewer and video editor for TeslaCam
 
-
 [![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/dri6_cSDTkA)
 
 Install
@@ -14,6 +13,9 @@ I have included a precompiled version in the Binary folder for easy install.
 
 ## [Report bugs or other issues by clicking here](https://docs.google.com/forms/d/e/1FAIpQLSdJ0CJAGLvgEIewbt9OHaU_JiJTP_AmIiecpvHEiHlWe4ZHcQ/viewform)
 
+### Help support Nate in making future improvements though PayPal
+
+[![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
 Version 2019.28.3.0 - With Video Editor/Export Options
 ======================================
