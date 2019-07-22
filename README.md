@@ -11,8 +11,6 @@ I have included a precompiled version in the Binary folder for easy install.
 
 * [Microsoft H.265 codec (HEVC Video Extensions)](https://www.microsoft.com/en-us/p/hevc-video-extensions-from-device-manufacturer/9n4wgh0z6vhq?irgwc=1&OCID=AID681541_aff_7593_159229&tduid=%28ir_wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0%29%287593%29%28159229%29%28%29%28UUwpUdUnU56397YYwYd%29&irclickid=wJC0gNTClQca0BAzqwxkEXPhUkjTGXQhW1412Y0&activetab=pivot%3Aoverviewtab)
 
-## [Report bugs or other issues here](https://docs.google.com/forms/d/e/1FAIpQLSdJ0CJAGLvgEIewbt9OHaU_JiJTP_AmIiecpvHEiHlWe4ZHcQ/viewform)
-
 ### Help support Nate in making future improvements though PayPal [![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
 Version 2019.30.0.0 - With Video Editor/Export Options
@@ -22,7 +20,7 @@ Version 2019.30.0.0 - With Video Editor/Export Options
                     
 ## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.30.0.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
-[YouTube Demo](https://youtu.be/dri6_cSDTkA)
+### [YouTube Demo](https://youtu.be/dri6_cSDTkA) on how to use TeslaCam Viewer
 
 * Larger install files due to including FFmpeg for video editing
 * Remove FFmpeg.exe to disable export functions
