@@ -13,12 +13,12 @@ I have included a precompiled version in the Binary folder for easy install.
 
 ### Help support Nate in making future improvements though PayPal [![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
-Version 2019.30.0.0 - With Video Editor/Export Options
+Version 2019.30.2.0 - With Video Editor/Export Options
 ======================================
 #### .NET Framework 3.5 must be installed
-## [Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.30.0.0.zip) - Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
+## [Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.30.2.0.zip) - Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
                     
-## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.30.0.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
+## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.30.2.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
 ### [YouTube Demo](https://youtu.be/dri6_cSDTkA) on how to use TeslaCam Viewer
 
