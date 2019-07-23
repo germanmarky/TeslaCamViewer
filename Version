@@ -1,4 +1,4 @@
-2019.30.0.0
+2019.30.2.0
 Updates
 -------------
 Added "Dutch" to supported languages - 30.0
@@ -28,6 +28,8 @@ Still FREE! - Please Donate!
 …………………………………………………………….
 Bug Fixes 
 -------------
+Keyboard shortcut for full screen - 30.2
+Sentry indicator disabled when only one clip is in an event folder - 30.2
 Fixed minor bugs  - 30.0
 Fixed playback speed when saving videos - 27.6.3
 Fixed playback speed issues when switching to next file - 27.6.1
