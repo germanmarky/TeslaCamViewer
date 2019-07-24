@@ -20,6 +20,8 @@ Version 2019.30.2.0 - With Video Editor/Export Options
                     
 ## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.30.2.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
+![#f03c15](https://placehold.it/15/f03c15/000000?text=+) ` If TeslaCam Viewer crashes the first time you select a folder and no error messages pop up then check out` [This Link](https://github.com/NateMccomb/TeslaCamViewer/issues/2#issuecomment-514275810).
+
 ### [YouTube Demo](https://youtu.be/dri6_cSDTkA) on how to use TeslaCam Viewer
 
 * Larger install files due to including FFmpeg for video editing
@@ -56,4 +58,4 @@ Features
 Known Bugs
 -------
 * This is a Tesla issue! - Some TeslaCam .mp4 files get corrupt either while they are being saved or within the video itself. Some video playback windows may not populate due to this reason. 
-
+* If TeslaCam Viewer crashes the first time you select a folder and no error messages pop up then check out [This Link](https://github.com/NateMccomb/TeslaCamViewer/issues/2#issuecomment-514275810).
