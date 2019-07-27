@@ -1,3 +1,5 @@
+## `Tesla's software update 2019.24.4 has changed how the TeslaCam files are saved/encoded and TeslaCam Viewer is currently having issues playing these files. A fix is in the works so check the app or back here in a few days for the update.` - 2019/07/27
+
 # TeslaCamViewer  
 A file viewer and video editor for TeslaCam
 
