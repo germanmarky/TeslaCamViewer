@@ -1,6 +1,7 @@
-2019.30.2.0
+2019.32.0.0
 Updates
 -------------
+Added a fix for Teslas 24.4 encoding bug - 32.0
 Added "Dutch" to supported languages - 30.0
 Added auto refresh of 'Explorer' window when a new drive is inserted - 30.0
 Added 'Sentry' indication in saved rendered videos - 30.0
