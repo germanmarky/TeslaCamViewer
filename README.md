@@ -1,9 +1,9 @@
-## `Tesla's software update 2019.24.4 has changed how the TeslaCam files are saved/encoded and TeslaCam Viewer is currently having issues playing these files. A fix is in the works so check the app or back here in a few days for the update.` - 2019/07/27
+## `Tesla's software update 2019.24.4 has changed how the TeslaCam files are saved/encoded. TeslaCam Viewer 2019.32.0.0 has a fix for this bug, Download it and check out the YouTube Demo on how to use it from the links below.` 
 
 # TeslaCamViewer  
 A file viewer and video editor for TeslaCam
 
-[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/dri6_cSDTkA)
+[![TeslaCamViewer](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/TeslaCamViewer-2019.24.1.png)](https://youtu.be/6n0JWAkoJaE)
 
 Install
 ======================================
@@ -15,16 +15,18 @@ I have included a precompiled version in the Binary folder for easy install.
 
 ### Help support Nate in making future improvements though PayPal [![Donate](https://github.com/NateMccomb/TeslaCamViewer/raw/master/TeslaCam%20Viewer/Resources/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8UKFUQCU9476N&source=url)
 
-Version 2019.30.2.0 - With Video Editor/Export Options
+Version 2019.32.0.0 - With Video Editor/Export Options
 ======================================
 #### .NET Framework 3.5 must be installed
-## [Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.30.2.0.zip) - Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
+## [Windows Installer Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Installer-TeslaCamViewer-2019.32.0.0.zip) - Includes .NET and everything needed for a full install. Start Menu and Desktop shortcuts created
                     
-## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.30.2.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
+## [Standalone Version](https://github.com/NateMccomb/TeslaCamViewer/raw/master/Binary/Standalone-TeslaCamViewer-2019.32.0.0.zip) - Just unzip and run. Great for keeping a copy on your TeslaCam Flash Drive
 
 ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) ` If TeslaCam Viewer crashes the first time you select a folder and no error messages pop up then check out` [This Link](https://github.com/NateMccomb/TeslaCamViewer/issues/2#issuecomment-514275810).
 
-### [YouTube Demo](https://youtu.be/dri6_cSDTkA) on how to use TeslaCam Viewer
+### [YouTube Demo](https://youtu.be/6n0JWAkoJaE) on how to use TeslaCam Viewer
+
+### [TeslaCam Viewer Stats](https://docs.google.com/spreadsheets/d/1QExW5ax8b3OHAjb-edN6RNC_9lUsP0ZlznMPyr7h_mI/preview#gid=1111298063) 
 
 * Larger install files due to including FFmpeg for video editing
 * Remove FFmpeg.exe to disable export functions
