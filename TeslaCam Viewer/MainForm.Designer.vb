@@ -22,6 +22,13 @@ Partial Class MainForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("HKLM\SOFTWARE\Microsoft\Active Setup\Installed Components\{22d6f312-b0f6-11d0-94ab-0080c74c7e95}") Is Nothing Then
+            MsgBox("You need to have Windows Media Player Installed to run TeslaCam Viewer" + vbCrLf + "1. Open Apps and Features" + vbCrLf + "2. Click Programs and Features on the right" + vbCrLf + "3. Click Turn Windows features on or off" + vbCrLf + "4. Click the checkbox on Media Features", MsgBoxStyle.OkCancel, "ERROR")
+            Me.Close()
+            End
+        Else
+            ' Key existed
+        End If
         Me.components = New System.ComponentModel.Container()
         Dim TreeNode6 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Custom Folder")
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
